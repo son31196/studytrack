@@ -73,36 +73,48 @@ document.head.appendChild(style);
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-/* ---------- pixel sage ---------- */
-const SCALE = 6, THRESHOLD = 10;
-const COLORS = { W:"#f4efe2", w:"#ddd3ba", S:"#e8b88a", s:"#c99668", G:"#e8c15a", g:"#a8842f", B:"#7a5230", Y:"#ffe97a" };
+/* ---------- pixel Keeper of the Light on horseback ----------
+   Original pixel grid modeled on "Keeper of the light" by searhere
+   (deviantart.com/searhere/art/Keeper-of-the-light-460325472). */
+const SCALE = 5, THRESHOLD = 10;
+const COLORS = {
+  t:"#6b4a26", W:"#eceff3", b:"#3f7fd2", B:"#2a5da8", w:"#dfe2e6", g:"#b9bfc9",
+  S:"#f0c8a0", s:"#d3a276", e:"#2b2b2b", m:"#4a2e14", h:"#a9683a", H:"#7d4a26",
+  G:"#f2c14e", d:"#c79a2a",
+};
 const SPRITE = [
-"..........www.............",
-".........wWWWw............",
-".........wWSSw............",
-".....Y...wSSSS............",
-".....B...wSSSs............",
-".....B...WWSSW............",
-".....B..WWWWW.............",
-".....B..WWWW..............",
-".....B.GGWWWG.............",
-".....B.wwwwwwwSS..........",
-".....B.wwwwwwwwwSS........",
-".....B.wwwwwwww...SS......",
-".....BGwwwwwwwwwwSS.......",
-".....B.wwwwwwww...SS......",
-".....B.wwwwwwwwwSS........",
-".....B.wwwwwwwSS..........",
-".....B..wwwwww............",
-".....B..wwwwwww...........",
-".....B.Gwwwwwwww..........",
-".....B.wwwwwwwwww.........",
-".....BGwwwwwwwwwww........",
-".....Bwwwwwwwwwwwww.......",
-"....gGGGGGGGGGGGGGG.......",
-"....gggggggggggggg........",
+"......tt................................",
+".....t..t...............................",
+".....t..t......WW.......................",
+".....t..t.....WWWW......................",
+".....t..t....WWbbWW...WWW...............",
+".....t.tt...WWbbbbWWWWWWWW..............",
+".....tt....WWBbbbbbWWWWWW...............",
+".....t....WWWWWbbbWWWW..................",
+".....t.....wSSSSSSeS....................",
+".....t....wwwsSSSSSs....................",
+".....t....wwwwwwwwws....................",
+".....t...wwwwwwwwww.....................",
+".....t...wwwbbbbwww.....................",
+".....t..www.bGbbbbbbbbSSS...............",
+".....t..www.bbbbbbbbbbbSSS..............",
+".....t..www.bGbbbbbbbbSSS...............",
+".....t..wwwGbbbbb.........m.............",
+".....t.wwwwGbbbbb...mm...mhhh...........",
+".....t.wwwwGbbbb...mhhhh.hhwhhe.........",
+".....t.wwwwGbbb...mhhhhhhhhwhhhh........",
+"...m...wwwwGmm....hhhhhhhhhwhhhm........",
+"..mmm..wwwwG.mm..hhhhhhhhh.hhh..........",
+"..mmm.wwwwwG..hhhhhhhhhhhh..............",
+"..mmm.wwwwwG.hhhhhhhhhhhhh..............",
+"...mm.wwwwwG.hhhhhhhhhhhhh..............",
+"...m...GGGG..hhh.HHhh..hHHh.............",
+"..............Hh...Hh..hH.Hh............",
+"..............Hh...Hh..hH..Hh...........",
+"..............Hh...Hh..hH..Hh...........",
+"..............mm...mm..mm..mm...........",
 ];
-const ORB = { x: 20.5, y: 12 };  // sprite coords of the orb between his hands
+const ORB = { x: 28.5, y: 14 };  // sprite coords of the orb ahead of his hands
 
 function drawSprite() {
   const c = document.createElement("canvas");
