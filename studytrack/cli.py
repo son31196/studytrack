@@ -63,6 +63,15 @@ def cmd_quiz(args):
     print(f"Next review: {t['next_review']}")
 
 
+def cmd_record_quiz(args):
+    syl = store.load_syllabus(args.course)
+    topic_ids = [t["id"] for t in syl.get("topics", [])]
+    if args.topic not in topic_ids:
+        raise SystemExit(f"Unknown topic '{args.topic}'. Topics: {', '.join(topic_ids)}")
+    t = mastery.record_quiz_result(args.course, args.topic, args.pct)
+    print(f"Recorded {args.pct:.0f}% on '{args.topic}' — mastery now {t['mastery']}%, next review {t['next_review']}.")
+
+
 def cmd_grade(args):
     grades.record_grade(args.course, args.component, args.name, args.score, args.max)
     syl = store.load_syllabus(args.course)
@@ -121,6 +130,10 @@ def main():
     p.add_argument("--topic", help="topic id (default: weakest due topic)")
     p.add_argument("-n", type=int, default=5, help="number of questions")
     p.set_defaults(func=cmd_quiz)
+
+    p = sub.add_parser("record-quiz", help="record a quiz result: course topic-id percent")
+    p.add_argument("course"), p.add_argument("topic"), p.add_argument("pct", type=float)
+    p.set_defaults(func=cmd_record_quiz)
 
     p = sub.add_parser("grade", help="record a grade: course component name score max")
     p.add_argument("course"), p.add_argument("component"), p.add_argument("name")
