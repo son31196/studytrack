@@ -164,7 +164,10 @@
   <section id="tab-planner">
     <div class="planner-grid">
       <div id="calendar"></div>
-      <div id="todopanel"></div>
+      <div>
+        <div id="todopanel"></div>
+        <div class="card" id="gcalpanel" style="margin-top:14px"></div>
+      </div>
     </div>
   </section>
 
@@ -235,7 +238,7 @@
 "use strict";
 const $ = (sel, el=document) => el.querySelector(sel);
 const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
-let DATA = null, PROJECTS = [], TODOS = [], BANNER_READY = false;
+let DATA = null, PROJECTS = [], TODOS = [], GCAL = { connected: false, events: [] }, BANNER_READY = false;
 
 function toast(msg, ms=2200) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
@@ -269,7 +272,9 @@ function renderPlanner(animate) {
     events.push({ date: e.date, label: `${c.code || c.id} ${e.name}`, type: "exam" })));
   TODOS.filter(t => t.due && !t.done).forEach(t =>
     events.push({ date: t.due, label: t.title, type: "todo" }));
+  GCAL.events.forEach(e => events.push(e));
   Planner.mountCalendar($("#calendar"), events);
+  renderGcalPanel();
   Planner.mountTodos($("#todopanel"), {
     items: TODOS, readonly: false,
     onAdd: async (title, due) => { await api("/api/todos", "POST", { title, due }); toast(`Added: ${title}`); await refresh(false); },
@@ -491,8 +496,37 @@ $("#logAdd").onclick = async () => {
 $("#regen").onclick = async () => { const r = await api("/api/dashboard", "POST"); toast("Static dashboard rebuilt"); };
 
 /* ---------- load ---------- */
+function renderGcalPanel() {
+  const host = $("#gcalpanel");
+  if (GCAL.connected) {
+    host.innerHTML = `
+      <div class="frow" style="justify-content:space-between">
+        <b style="font-size:14px">Google Calendar <span style="color:var(--good-text)">✓ connected</span></b>
+        <button class="btn ghost" id="gcalOff">disconnect</button>
+      </div>
+      <div class="hint">${GCAL.error ? esc(GCAL.error) : `${GCAL.events.length} events shown in the calendar (refreshes every 10 min)`}</div>`;
+    $("#gcalOff").onclick = async () => { await api("/api/gcal", "DELETE"); toast("Google Calendar disconnected"); await refresh(false); };
+  } else {
+    host.innerHTML = `
+      <b style="font-size:14px">Google Calendar</b>
+      <div class="hint" style="margin:6px 0">Show your Google events here. In Google Calendar:
+        Settings → your calendar → <b>Integrate calendar</b> → copy the <b>Secret address in iCal format</b>.
+        It stays on this machine only (git-ignored).</div>
+      <div class="frow">
+        <input id="gcalUrl" placeholder="https://calendar.google.com/calendar/ical/…/basic.ics" style="flex:1;min-width:180px">
+        <button class="btn primary" id="gcalOn">Connect</button>
+      </div>`;
+    $("#gcalOn").onclick = async () => {
+      const url = $("#gcalUrl").value.trim(); if (!url) return;
+      await api("/api/gcal", "POST", { url });
+      toast("Google Calendar connected"); await refresh(false);
+    };
+  }
+}
+
 async function refresh(resetEditor=true) {
-  [DATA, PROJECTS, TODOS] = await Promise.all([api("/api/overview"), api("/api/projects"), api("/api/todos")]);
+  [DATA, PROJECTS, TODOS, GCAL] = await Promise.all([
+    api("/api/overview"), api("/api/projects"), api("/api/todos"), api("/api/gcal/events")]);
   renderPlanner(!resetEditor); renderOverview(); renderProjects(); renderHours();
   const sel = $("#editTarget"), cur = sel.value;
   sel.innerHTML = `<option value="">— new course —</option>` +

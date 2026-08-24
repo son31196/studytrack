@@ -25,6 +25,57 @@ def index():
     return send_from_directory(WEBUI_DIR, "index.html")
 
 
+GCAL_FILE = store.ROOT / ".gcal-url"
+_gcal_cache = {"at": 0.0, "events": None}
+
+
+@app.get("/api/gcal/events")
+def gcal_events():
+    import time
+
+    from . import gcal
+
+    if not GCAL_FILE.exists():
+        return jsonify({"connected": False, "events": []})
+    if _gcal_cache["events"] is not None and time.time() - _gcal_cache["at"] < 600:
+        return jsonify({"connected": True, "events": _gcal_cache["events"]})
+    try:
+        from datetime import timedelta
+
+        today = date.today()
+        ics = gcal.fetch(GCAL_FILE.read_text().strip())
+        events = gcal.events_between(ics, today - timedelta(days=60), today + timedelta(days=240))
+    except Exception as e:
+        return jsonify({"connected": True, "events": [], "error": f"Google Calendar fetch failed: {e}"})
+    _gcal_cache.update(at=time.time(), events=events)
+    return jsonify({"connected": True, "events": events})
+
+
+@app.post("/api/gcal")
+def gcal_connect():
+    from . import gcal
+
+    url = (request.get_json(force=True).get("url") or "").strip()
+    if not url.startswith("https://"):
+        return jsonify({"error": "paste the https:// secret iCal address"}), 400
+    try:
+        ics = gcal.fetch(url)
+    except Exception as e:
+        return jsonify({"error": f"could not fetch that URL: {e}"}), 400
+    if "BEGIN:VCALENDAR" not in ics:
+        return jsonify({"error": "that URL is not an iCal feed"}), 400
+    GCAL_FILE.write_text(url + "\n")
+    _gcal_cache.update(at=0.0, events=None)
+    return jsonify({"ok": True})
+
+
+@app.delete("/api/gcal")
+def gcal_disconnect():
+    GCAL_FILE.unlink(missing_ok=True)
+    _gcal_cache.update(at=0.0, events=None)
+    return jsonify({"ok": True})
+
+
 @app.get("/planner.js")
 def planner_js():
     return send_from_directory(WEBUI_DIR, "planner.js")

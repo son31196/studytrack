@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 .env
+
+# Google Calendar secret feed URL — never commit
+.gcal-url

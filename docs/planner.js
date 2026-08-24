@@ -48,6 +48,7 @@ const CSS = `
   overflow: hidden; text-overflow: ellipsis; }
 .cal-ev.exam { background: rgba(208,59,59,.14); color: var(--critical); font-weight: 600; }
 .cal-ev.todo { background: rgba(42,120,214,.14); color: var(--accent-deep); }
+.cal-ev.gcal { background: rgba(27,175,122,.14); color: var(--good-text); }
 .cal-more { font-size: 10px; color: var(--muted); }
 
 .todo { display: flex; flex-direction: column; gap: 8px; }
