@@ -1,0 +1,19 @@
+<!doctype html><meta charset='utf-8'><title>Semester Dashboard</title><style>
+:root { --bg:#fff; --fg:#1a1a1a; --muted:#666; --card:#f6f6f8; --bar:#4f7cff; --ok:#1a9950; --warn:#cc8800; --bad:#cc3344; }
+@media (prefers-color-scheme: dark) { :root { --bg:#15161a; --fg:#eee; --muted:#999; --card:#22242a; } }
+body { background:var(--bg); color:var(--fg); font-family:system-ui,sans-serif; max-width:860px; margin:2rem auto; padding:0 1rem; }
+h1 { font-size:1.5rem; } h2 { font-size:1.15rem; margin-top:2rem; }
+.card { background:var(--card); border-radius:10px; padding:1rem 1.25rem; margin:0.75rem 0; }
+.bar { background:rgba(128,128,128,.25); border-radius:4px; height:10px; overflow:hidden; }
+.bar span { display:block; height:100%; background:var(--bar); }
+.row { display:flex; justify-content:space-between; align-items:center; gap:1rem; margin:.35rem 0; }
+.row .label { flex:0 0 40%; } .row .bar { flex:1; }
+.muted { color:var(--muted); font-size:.9rem; }
+.big { font-size:1.6rem; font-weight:700; }
+.ok { color:var(--ok); } .warn { color:var(--warn); } .bad { color:var(--bad); }
+</style>
+<h1>Semester Dashboard</h1>
+<p class="muted">Generated 2026-08-24 · Goal: full A+</p>
+<div class="card"><h2 style="margin-top:0">Calculus I (example)</h2><div class="row"><span class="big">—</span><span><span class="warn">need ≥97.0% on remaining work for A+</span></span></div><p class="muted">Avg mastery 0.0% · Due for review: Limits and continuity, Derivatives and differentiation rules, Applications of derivatives, Integrals and the fundamental theorem</p><div class="row"><div class="label">Limits and continuity</div><div class="bar"><span style="width:0%"></span></div><div class="muted">0</div></div><div class="row"><div class="label">Derivatives and differentiation rules</div><div class="bar"><span style="width:0%"></span></div><div class="muted">0</div></div><div class="row"><div class="label">Applications of derivatives</div><div class="bar"><span style="width:0%"></span></div><div class="muted">0</div></div><div class="row"><div class="label">Integrals and the fundamental theorem</div><div class="bar"><span style="width:0%"></span></div><div class="muted">0</div></div></div>
+<h2>Side Projects</h2>
+<div class="card"><strong>Personal website</strong> <span class="muted">(active)</span><div class="bar"><span style="width:33.333333333333336%"></span></div><p class='muted'>1/3 tasks done</p></div>
