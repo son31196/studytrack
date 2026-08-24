@@ -146,21 +146,29 @@
 </head>
 <body>
 <main>
+  <div id="banner"></div>
   <div class="topbar">
-    <h1>StudyTrack</h1>
     <span class="date" id="today"></span>
     <span class="spacer"></span>
     <button class="btn" id="regen" title="Rebuild docs/index.html for GitHub Pages">Rebuild static dashboard</button>
   </div>
 
   <nav class="tabs" id="tabs">
-    <button data-tab="overview" class="on">Overview</button>
+    <button data-tab="planner" class="on">Planner</button>
+    <button data-tab="overview">Courses</button>
     <button data-tab="editor">Add / edit course</button>
     <button data-tab="projects">Side projects</button>
     <button data-tab="hours">Hours</button>
   </nav>
 
-  <section id="tab-overview">
+  <section id="tab-planner">
+    <div class="planner-grid">
+      <div id="calendar"></div>
+      <div id="todopanel"></div>
+    </div>
+  </section>
+
+  <section id="tab-overview" hidden>
     <div class="banner" id="studynext" hidden></div>
     <div class="grid" id="courses"></div>
   </section>
@@ -222,11 +230,12 @@
 </main>
 <div class="toast" id="toast"></div>
 
+<script src="planner.js"></script>
 <script>
 "use strict";
 const $ = (sel, el=document) => el.querySelector(sel);
 const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
-let DATA = null, PROJECTS = [];
+let DATA = null, PROJECTS = [], TODOS = [], BANNER_READY = false;
 
 function toast(msg, ms=2200) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
@@ -244,8 +253,30 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 $("#tabs").addEventListener("click", e => {
   const btn = e.target.closest("button"); if (!btn) return;
   $$("#tabs button").forEach(b => b.classList.toggle("on", b === btn));
-  ["overview","editor","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
+  ["planner","overview","editor","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
 });
+
+/* ---------- planner: banner charge, calendar, todos ---------- */
+function doneCount() {
+  return TODOS.filter(t => t.done).length +
+    PROJECTS.reduce((a, p) => a + p.tasks.filter(t => t.done).length, 0);
+}
+function renderPlanner(animate) {
+  if (!BANNER_READY) { Planner.mountBanner($("#banner"), { done: doneCount() }); BANNER_READY = true; }
+  else Planner.setCharge(doneCount(), { animate });
+  const events = [];
+  DATA.courses.forEach(c => (c.exams || []).forEach(e =>
+    events.push({ date: e.date, label: `${c.code || c.id} ${e.name}`, type: "exam" })));
+  TODOS.filter(t => t.due && !t.done).forEach(t =>
+    events.push({ date: t.due, label: t.title, type: "todo" }));
+  Planner.mountCalendar($("#calendar"), events);
+  Planner.mountTodos($("#todopanel"), {
+    items: TODOS, readonly: false,
+    onAdd: async (title, due) => { await api("/api/todos", "POST", { title, due }); toast(`Added: ${title}`); await refresh(false); },
+    onToggle: async (id, done) => { await api(`/api/todos/${id}`, "PUT", { done }); await refresh(false); },
+    onDelete: async (id) => { await api(`/api/todos/${id}`, "DELETE"); await refresh(false); },
+  });
+}
 
 /* ---------- overview ---------- */
 function termChip(term) {
@@ -417,7 +448,7 @@ function renderProjects() {
 async function saveProject(card) {
   const p = PROJECTS.find(x => x.id === card.dataset.project);
   await api(`/api/projects/${p.id}`, "PUT", p);
-  renderProjects();
+  renderProjects(); renderPlanner(true);
 }
 $("#projects").addEventListener("change", async e => {
   const card = e.target.closest(".projcard"); if (!card) return;
@@ -461,8 +492,8 @@ $("#regen").onclick = async () => { const r = await api("/api/dashboard", "POST"
 
 /* ---------- load ---------- */
 async function refresh(resetEditor=true) {
-  [DATA, PROJECTS] = await Promise.all([api("/api/overview"), api("/api/projects")]);
-  renderOverview(); renderProjects(); renderHours();
+  [DATA, PROJECTS, TODOS] = await Promise.all([api("/api/overview"), api("/api/projects"), api("/api/todos")]);
+  renderPlanner(!resetEditor); renderOverview(); renderProjects(); renderHours();
   const sel = $("#editTarget"), cur = sel.value;
   sel.innerHTML = `<option value="">— new course —</option>` +
     DATA.courses.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");

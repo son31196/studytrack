@@ -25,6 +25,62 @@ def index():
     return send_from_directory(WEBUI_DIR, "index.html")
 
 
+@app.get("/planner.js")
+def planner_js():
+    return send_from_directory(WEBUI_DIR, "planner.js")
+
+
+@app.get("/api/todos")
+def get_todos():
+    return jsonify(store.load_todos())
+
+
+@app.post("/api/todos")
+def add_todo():
+    body = request.get_json(force=True)
+    title = (body.get("title") or "").strip()
+    if not title:
+        return jsonify({"error": "title required"}), 400
+    items = store.load_todos()
+    item = {
+        "id": 1 + max((t["id"] for t in items), default=0),
+        "title": title,
+        "due": body.get("due") or None,
+        "done": False,
+    }
+    items.append(item)
+    store.save_todos(items)
+    return jsonify(item)
+
+
+@app.put("/api/todos/<int:tid>")
+def update_todo(tid):
+    body = request.get_json(force=True)
+    items = store.load_todos()
+    for t in items:
+        if t["id"] == tid:
+            if "done" in body:
+                t["done"] = bool(body["done"])
+                t["done_date"] = date.today().isoformat() if t["done"] else None
+            if body.get("title", "").strip():
+                t["title"] = body["title"].strip()
+            if "due" in body:
+                t["due"] = body["due"] or None
+            store.save_todos(items)
+            return jsonify(t)
+    return jsonify({"error": "no such todo"}), 404
+
+
+@app.delete("/api/todos/<int:tid>")
+def delete_todo(tid):
+    items = store.load_todos()
+    kept = [t for t in items if t["id"] != tid]
+    if len(kept) == len(items):
+        return jsonify({"error": "no such todo"}), 404
+    store.save_todos(kept)
+    return jsonify({"ok": True})
+
+
 @app.get("/api/overview")
 def overview():
     today = date.today().isoformat()

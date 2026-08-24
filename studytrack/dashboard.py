@@ -5,7 +5,9 @@ data baked in as JSON and rendered client-side — interactive to browse, but
 read-only: edits happen in `python study.py ui`, then `study.py sync` republishes.
 """
 import json
+import shutil
 from datetime import date
+from pathlib import Path
 
 from . import grades, mastery, store
 
@@ -100,18 +102,25 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <main>
+  <div id="banner"></div>
   <div class="topbar">
-    <h1>StudyTrack</h1>
     <span class="date" id="today"></span>
     <span class="spacer"></span>
     <span class="ro">read-only · edit with <b>study.py ui</b>, publish with <b>study.py sync</b></span>
   </div>
   <nav class="tabs" id="tabs">
-    <button data-tab="overview" class="on">Overview</button>
+    <button data-tab="planner" class="on">Planner</button>
+    <button data-tab="overview">Courses</button>
     <button data-tab="projects">Side projects</button>
     <button data-tab="hours">Hours</button>
   </nav>
-  <section id="tab-overview">
+  <section id="tab-planner">
+    <div class="planner-grid">
+      <div id="calendar"></div>
+      <div id="todopanel"></div>
+    </div>
+  </section>
+  <section id="tab-overview" hidden>
     <div class="banner" id="studynext" hidden></div>
     <div class="filters" id="termfilter">
       <button data-t="" class="on">All terms</button>
@@ -127,6 +136,7 @@ TEMPLATE = """<!doctype html>
   </section>
 </main>
 <script id="data" type="application/json">__DATA__</script>
+<script src="planner.js"></script>
 <script>
 "use strict";
 const DATA = JSON.parse(document.getElementById("data").textContent);
@@ -137,7 +147,7 @@ let TERM = "";
 document.getElementById("tabs").addEventListener("click", e => {
   const btn = e.target.closest("button"); if (!btn) return;
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b === btn));
-  ["overview","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
+  ["planner","overview","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
 });
 document.getElementById("termfilter").addEventListener("click", e => {
   const btn = e.target.closest("button"); if (!btn) return;
@@ -228,6 +238,17 @@ if (DATA.study_next) {
     <span class="why">${esc(DATA.study_next.course_name)} — weakest course with topics due (avg mastery ${DATA.study_next.avg_mastery}%)</span>`;
 }
 renderCourses(); renderProjects(); renderHours();
+
+const doneCount = DATA.todos.filter(t => t.done).length +
+  DATA.projects.reduce((a, p) => a + p.tasks.filter(t => t.done).length, 0);
+Planner.mountBanner($("#banner"), { done: doneCount });
+const events = [];
+DATA.courses.forEach(c => (c.exams || []).forEach(e =>
+  events.push({ date: e.date, label: `${c.code || c.id} ${e.name}`, type: "exam" })));
+DATA.todos.filter(t => t.due && !t.done).forEach(t =>
+  events.push({ date: t.due, label: t.title, type: "todo" }));
+Planner.mountCalendar($("#calendar"), events);
+Planner.mountTodos($("#todopanel"), { items: DATA.todos, readonly: true });
 </script>
 </body>
 </html>
@@ -275,7 +296,14 @@ def build_data() -> dict:
         projects.append(p)
     timelog = store.load_timelog()
     hours = {name: round(sum(e["hours"] for e in entries), 1) for name, entries in timelog.items()}
-    return {"today": today, "courses": courses, "study_next": best_pick, "projects": projects, "hours": hours}
+    return {
+        "today": today,
+        "courses": courses,
+        "study_next": best_pick,
+        "projects": projects,
+        "hours": hours,
+        "todos": store.load_todos(),
+    }
 
 
 def render() -> str:
@@ -287,4 +315,5 @@ def write(path=None):
     out = path or (store.ROOT / "docs" / "index.html")
     out.parent.mkdir(exist_ok=True)
     out.write_text(render())
+    shutil.copy(Path(__file__).resolve().parent / "webui" / "planner.js", out.parent / "planner.js")
     return out

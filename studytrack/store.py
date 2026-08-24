@@ -67,6 +67,14 @@ def save_timelog(data: dict):
     _save_json("timelog.json", data)
 
 
+def load_todos() -> list:
+    return _load_json("todos.json").get("items", [])
+
+
+def save_todos(items: list):
+    _save_json("todos.json", {"items": items})
+
+
 def load_projects() -> list:
     if not PROJECTS_DIR.exists():
         return []
