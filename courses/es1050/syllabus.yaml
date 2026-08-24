@@ -1,0 +1,33 @@
+name: Foundations of Engineering Practice
+code: ES 1050
+term: full-year  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Design projects
+    weight: 50
+  - name: Assignments
+    weight: 25
+  - name: Studio participation
+    weight: 25
+
+exams:
+  - name: Final design review
+    date: 2027-04-16
+
+topics:
+  - id: the-engineering-design-process
+    title: "The engineering design process"
+  - id: problem-definition-and-needs-analysis
+    title: "Problem definition and needs analysis"
+  - id: concept-generation-and-selection
+    title: "Concept generation and selection"
+  - id: cad-and-prototyping
+    title: "CAD and prototyping"
+  - id: teamwork-and-project-management
+    title: "Teamwork and project management"
+  - id: engineering-communication
+    title: "Engineering communication"
+  - id: ethics-professionalism-and-sustainabilit
+    title: "Ethics, professionalism, and sustainability"

@@ -1,0 +1,37 @@
+name: Calculus for Engineers II
+code: NMM 1414B
+term: winter  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Assignments
+    weight: 15
+  - name: Quizzes
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2027-02-26
+  - name: Final
+    date: 2027-04-16
+
+topics:
+  - id: integration-techniques
+    title: "Integration techniques"
+  - id: applications-of-integration-area-volume
+    title: "Applications of integration (area, volume, arc length)"
+  - id: sequences-and-series
+    title: "Sequences and series"
+  - id: convergence-tests
+    title: "Convergence tests"
+  - id: power-and-taylor-series
+    title: "Power and Taylor series"
+  - id: parametric-curves-and-polar-coordinates
+    title: "Parametric curves and polar coordinates"
+  - id: introduction-to-differential-equations
+    title: "Introduction to differential equations"

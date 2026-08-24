@@ -1,0 +1,37 @@
+name: Calculus for Engineers I
+code: NMM 1412A
+term: fall  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Assignments
+    weight: 15
+  - name: Quizzes
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2026-10-30
+  - name: Final
+    date: 2026-12-14
+
+topics:
+  - id: limits-and-continuity
+    title: "Limits and continuity"
+  - id: derivatives-and-differentiation-rules
+    title: "Derivatives and differentiation rules"
+  - id: implicit-and-logarithmic-differentiation
+    title: "Implicit and logarithmic differentiation"
+  - id: related-rates-and-optimization
+    title: "Related rates and optimization"
+  - id: curve-sketching-and-l-hopital-s-rule
+    title: "Curve sketching and l'Hopital's rule"
+  - id: antiderivatives-and-the-definite-integra
+    title: "Antiderivatives and the definite integral"
+  - id: the-fundamental-theorem-of-calculus
+    title: "The fundamental theorem of calculus"

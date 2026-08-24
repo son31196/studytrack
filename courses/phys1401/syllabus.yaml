@@ -1,0 +1,37 @@
+name: Physics for Engineering Students I
+code: PHYS 1401A
+term: fall  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Labs
+    weight: 15
+  - name: Assignments
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2026-10-30
+  - name: Final
+    date: 2026-12-14
+
+topics:
+  - id: kinematics-in-one-and-two-dimensions
+    title: "Kinematics in one and two dimensions"
+  - id: newton-s-laws-of-motion
+    title: "Newton's laws of motion"
+  - id: work-and-energy
+    title: "Work and energy"
+  - id: momentum-impulse-and-collisions
+    title: "Momentum, impulse, and collisions"
+  - id: rotational-motion-and-torque
+    title: "Rotational motion and torque"
+  - id: static-equilibrium-and-elasticity
+    title: "Static equilibrium and elasticity"
+  - id: oscillations-and-simple-harmonic-motion
+    title: "Oscillations and simple harmonic motion"

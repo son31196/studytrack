@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyTrack</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --hairline: #e1e0d9;
+    --ring: rgba(11,11,11,0.10);
+    --accent: #2a78d6;
+    --accent-deep: #1c5cab;
+    --track: #f0efec;
+    --good: #0ca30c;
+    --good-text: #006300;
+    --critical: #d03b3b;
+    --warning: #fab219;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --muted: #898781;
+      --hairline: #2c2c2a;
+      --ring: rgba(255,255,255,0.10);
+      --accent: #3987e5;
+      --accent-deep: #86b6ef;
+      --track: #383835;
+      --good: #0ca30c;
+      --good-text: #0ca30c;
+      --critical: #d03b3b;
+      --warning: #fab219;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--page); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+    padding: 24px 20px 80px;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .topbar { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; }
+  .topbar .date { color: var(--muted); font-size: 13px; }
+  .topbar .spacer { flex: 1; }
+
+  nav.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--hairline); margin-bottom: 20px; }
+  nav.tabs button {
+    appearance: none; background: none; border: none; cursor: pointer;
+    font: inherit; font-weight: 600; color: var(--ink-2);
+    padding: 8px 14px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  nav.tabs button.on { color: var(--ink); border-bottom-color: var(--accent); }
+
+  .banner {
+    background: var(--surface); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .banner .lead { font-weight: 600; }
+  .banner .why { color: var(--ink-2); font-size: 13px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--ring); border-radius: 10px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .card h3 { font-size: 15px; font-weight: 700; }
+  .card .code { color: var(--muted); font-size: 12px; font-weight: 500; margin-left: 6px; }
+  .chip {
+    font-size: 11px; font-weight: 600; color: var(--ink-2);
+    border: 1px solid var(--hairline); border-radius: 999px; padding: 1px 8px; white-space: nowrap;
+  }
+  .statrow { display: flex; gap: 22px; }
+  .stat .v { font-size: 22px; font-weight: 700; }
+  .stat .l { font-size: 11.5px; color: var(--muted); }
+  .need { font-size: 13px; color: var(--ink-2); }
+  .need.out { color: var(--critical); font-weight: 600; }
+  .need .ok { color: var(--good-text); font-weight: 600; }
+
+  .bar { height: 6px; border-radius: 4px; background: var(--track); overflow: hidden; }
+  .bar > i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
+  .topicline { display: grid; grid-template-columns: 1fr 120px 34px; gap: 10px; align-items: center; font-size: 13px; }
+  .topicline .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topicline .pct { color: var(--muted); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+  .due-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--warning); margin-right: 6px; vertical-align: 1px; }
+
+  details.actions { border-top: 1px solid var(--hairline); padding-top: 8px; }
+  details.actions summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent-deep); list-style: none; }
+  details.actions summary::-webkit-details-marker { display: none; }
+  .aform { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+  .aform .label { font-size: 12.5px; color: var(--ink-2); width: 100%; font-weight: 600; }
+
+  input, select, button.btn {
+    font: inherit; font-size: 13.5px; color: var(--ink);
+    background: var(--page); border: 1px solid var(--hairline); border-radius: 7px; padding: 6px 9px;
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  input.sm { width: 74px; }
+  button.btn {
+    cursor: pointer; font-weight: 600; background: var(--surface);
+  }
+  button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.btn.ghost { border-color: transparent; background: none; color: var(--accent-deep); padding: 4px 6px; }
+
+  form.editor { background: var(--surface); border: 1px solid var(--ring); border-radius: 10px; padding: 20px; display: flex; flex-direction: column; gap: 16px; max-width: 720px; }
+  form.editor h2 { font-size: 17px; }
+  .frow { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .fcol { display: flex; flex-direction: column; gap: 4px; }
+  .fcol > span { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  fieldset { border: 1px solid var(--hairline); border-radius: 8px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+  legend { font-size: 12.5px; font-weight: 700; color: var(--ink-2); padding: 0 6px; }
+  .hint { font-size: 12px; color: var(--muted); }
+  .hint.bad { color: var(--critical); font-weight: 600; }
+
+  .projcard .task { display: flex; align-items: center; gap: 9px; font-size: 14px; padding: 3px 0; }
+  .projcard .task input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+  .projcard .task.done span { color: var(--muted); text-decoration: line-through; }
+  .projcard .meta { font-size: 12px; color: var(--muted); }
+  .status-pill { font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 9px; }
+  .status-pill.active { color: var(--good-text); border: 1px solid var(--good); }
+  .status-pill.paused { color: var(--ink-2); border: 1px solid var(--hairline); }
+  .status-pill.done { color: var(--muted); border: 1px solid var(--hairline); }
+
+  table.hours { border-collapse: collapse; font-size: 14px; min-width: 320px; }
+  table.hours th { text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; padding: 6px 18px 6px 0; border-bottom: 1px solid var(--hairline); }
+  table.hours td { padding: 7px 18px 7px 0; border-bottom: 1px solid var(--hairline); font-variant-numeric: tabular-nums; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: var(--page); font-size: 13.5px; font-weight: 600;
+    padding: 9px 16px; border-radius: 8px; opacity: 0; transition: opacity .18s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+  .empty { color: var(--muted); font-size: 14px; padding: 30px 0; text-align: center; }
+  section[hidden] { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <div class="topbar">
+    <h1>StudyTrack</h1>
+    <span class="date" id="today"></span>
+    <span class="spacer"></span>
+    <button class="btn" id="regen" title="Rebuild docs/index.html for GitHub Pages">Rebuild static dashboard</button>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="overview" class="on">Overview</button>
+    <button data-tab="editor">Add / edit course</button>
+    <button data-tab="projects">Side projects</button>
+    <button data-tab="hours">Hours</button>
+  </nav>
+
+  <section id="tab-overview">
+    <div class="banner" id="studynext" hidden></div>
+    <div class="grid" id="courses"></div>
+  </section>
+
+  <section id="tab-editor" hidden>
+    <form class="editor" id="courseForm">
+      <h2 id="editorTitle">Add a course</h2>
+      <div class="frow">
+        <label class="fcol"><span>Editing</span>
+          <select id="editTarget"><option value="">— new course —</option></select>
+        </label>
+        <label class="fcol"><span>Name</span><input id="cName" required placeholder="Calculus for Engineers I" style="width:260px"></label>
+        <label class="fcol"><span>Code</span><input id="cCode" placeholder="NMM 1412A" style="width:120px"></label>
+      </div>
+      <div class="frow">
+        <label class="fcol"><span>Term</span>
+          <select id="cTerm"><option value="fall">Fall</option><option value="winter">Winter</option><option value="full-year">Full year</option></select>
+        </label>
+        <label class="fcol"><span>A+ cutoff %</span><input id="cCutoff" type="number" step="0.5" value="90" class="sm"></label>
+      </div>
+      <fieldset id="fsComponents">
+        <legend>Graded components (weights must sum to 100)</legend>
+        <div id="compRows"></div>
+        <div class="frow"><button type="button" class="btn ghost" id="addComp">+ add component</button><span class="hint" id="weightSum"></span></div>
+      </fieldset>
+      <fieldset id="fsTopics">
+        <legend>Topics (drive mastery tracking & quizzes)</legend>
+        <div id="topicRows"></div>
+        <button type="button" class="btn ghost" id="addTopic" style="align-self:flex-start">+ add topic</button>
+      </fieldset>
+      <fieldset id="fsExams">
+        <legend>Exam dates</legend>
+        <div id="examRows"></div>
+        <button type="button" class="btn ghost" id="addExam" style="align-self:flex-start">+ add exam</button>
+      </fieldset>
+      <div class="frow">
+        <button class="btn primary" type="submit" id="saveCourse">Save course</button>
+        <span class="hint">Writes courses/&lt;id&gt;/syllabus.yaml — the CLI and /quiz see it immediately.</span>
+      </div>
+    </form>
+  </section>
+
+  <section id="tab-projects" hidden>
+    <div class="frow" style="margin-bottom:16px">
+      <input id="npName" placeholder="New project name" style="width:240px">
+      <button class="btn primary" id="npAdd">Add project</button>
+    </div>
+    <div class="grid" id="projects"></div>
+  </section>
+
+  <section id="tab-hours" hidden>
+    <div class="frow" style="margin-bottom:16px">
+      <select id="logName"></select>
+      <input id="logHours" type="number" step="0.25" min="0" placeholder="hours" class="sm">
+      <button class="btn primary" id="logAdd">Log time</button>
+    </div>
+    <table class="hours"><thead><tr><th>Course / project</th><th>Total hours</th></tr></thead><tbody id="hoursBody"></tbody></table>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $ = (sel, el=document) => el.querySelector(sel);
+const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
+let DATA = null, PROJECTS = [];
+
+function toast(msg, ms=2200) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), ms);
+}
+async function api(path, method="GET", body=null) {
+  const res = await fetch(path, { method, headers: body ? {"Content-Type":"application/json"} : {}, body: body ? JSON.stringify(body) : null });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { toast(data.error || `Error ${res.status}`, 3500); throw new Error(data.error || res.status); }
+  return data;
+}
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+/* ---------- tabs ---------- */
+$("#tabs").addEventListener("click", e => {
+  const btn = e.target.closest("button"); if (!btn) return;
+  $$("#tabs button").forEach(b => b.classList.toggle("on", b === btn));
+  ["overview","editor","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
+});
+
+/* ---------- overview ---------- */
+function termChip(term) {
+  const label = {fall:"Fall", winter:"Winter", "full-year":"Full year"}[term] || term;
+  return term ? `<span class="chip">${esc(label)}</span>` : "";
+}
+function renderOverview() {
+  const { courses, study_next, today } = DATA;
+  $("#today").textContent = today;
+  const sn = $("#studynext");
+  if (study_next) {
+    sn.hidden = false;
+    sn.innerHTML = `<span class="lead">Study next: ${esc(study_next.topic_title)}</span>
+      <span class="why">${esc(study_next.course_name)} — weakest course with topics due (avg mastery ${study_next.avg_mastery}%)</span>
+      <span class="why">Quiz it free with <b>/quiz ${esc(study_next.course)}</b> in Claude Code</span>`;
+  } else sn.hidden = true;
+
+  const host = $("#courses");
+  if (!courses.length) { host.innerHTML = `<div class="empty">No courses yet — add one in the editor tab.</div>`; return; }
+  host.innerHTML = courses.map(c => {
+    const g = c.grade, m = c.mastery;
+    const grade = g.current !== null ? g.current + "%" : "—";
+    let need = "";
+    if (g.needed_for_aplus !== null) {
+      need = g.aplus_achievable
+        ? `<div class="need">need <span class="ok">≥${g.needed_for_aplus}%</span> on remaining for A+ (cutoff ${g.cutoff}%)</div>`
+        : `<div class="need out">A+ out of reach — needs ${g.needed_for_aplus}% on remaining</div>`;
+    } else if (g.current !== null) {
+      need = g.aplus_achievable ? `<div class="need"><span class="ok">A+ secured 🎉</span></div>` : `<div class="need out">final grade below A+ cutoff</div>`;
+    }
+    const dueSet = new Set(m.topics_due);
+    const topics = c.topics.map(t => `
+      <div class="topicline">
+        <span class="t">${dueSet.has(t.title) ? '<span class="due-dot" title="due for review"></span>' : ""}${esc(t.title)}</span>
+        <span class="bar"><i style="width:${t.mastery || 0}%"></i></span>
+        <span class="pct">${Math.round(t.mastery || 0)}</span>
+      </div>`).join("");
+    const compOpts = c.components.map(x => `<option>${esc(x.name)}</option>`).join("");
+    const topicOpts = c.topics.map(t => `<option value="${esc(t.id)}">${esc(t.title)}</option>`).join("");
+    return `<div class="card" data-course="${esc(c.id)}">
+      <div class="frow" style="justify-content:space-between">
+        <h3>${esc(c.name)}<span class="code">${esc(c.code)}</span></h3>${termChip(c.term)}
+      </div>
+      <div class="statrow">
+        <div class="stat"><div class="v">${grade}</div><div class="l">current grade</div></div>
+        <div class="stat"><div class="v">${m.avg_mastery}%</div><div class="l">avg mastery</div></div>
+        <div class="stat"><div class="v">${m.topics_due.length}</div><div class="l">topics due</div></div>
+      </div>
+      ${need}
+      <div>${topics || '<div class="hint">no topics yet</div>'}</div>
+      <details class="actions"><summary>Record grade · quiz result · hours</summary>
+        <form class="aform" data-act="grade">
+          <span class="label">Grade</span>
+          <select name="component">${compOpts}</select>
+          <input name="name" placeholder="HW1" style="width:90px" required>
+          <input name="score" class="sm" type="number" step="any" placeholder="score" required>
+          <span class="hint">/</span>
+          <input name="max" class="sm" type="number" step="any" placeholder="max" required>
+          <button class="btn">Save</button>
+        </form>
+        <form class="aform" data-act="quiz">
+          <span class="label">Quiz result</span>
+          <select name="topic">${topicOpts}</select>
+          <input name="pct" class="sm" type="number" min="0" max="100" step="any" placeholder="%" required>
+          <button class="btn">Save</button>
+        </form>
+        <form class="aform" data-act="hours">
+          <span class="label">Study hours</span>
+          <input name="hours" class="sm" type="number" min="0" step="0.25" placeholder="1.5" required>
+          <button class="btn">Log</button>
+        </form>
+      </details>
+    </div>`;
+  }).join("");
+}
+
+$("#courses").addEventListener("submit", async e => {
+  e.preventDefault();
+  const form = e.target, course = form.closest(".card").dataset.course;
+  const f = Object.fromEntries(new FormData(form));
+  if (form.dataset.act === "grade") {
+    await api("/api/grades", "POST", { course, ...f });
+    toast(`Recorded ${f.name}: ${f.score}/${f.max}`);
+  } else if (form.dataset.act === "quiz") {
+    const r = await api("/api/quiz-result", "POST", { course, topic: f.topic, pct: f.pct });
+    toast(`Mastery → ${r.topic.mastery}% · next review ${r.topic.next_review}`);
+  } else {
+    const r = await api("/api/log", "POST", { name: course, hours: f.hours });
+    toast(`Logged ${f.hours}h (total ${r.total}h)`);
+  }
+  form.reset();
+  await refresh(false);
+});
+
+/* ---------- course editor ---------- */
+function row(html) { const d = document.createElement("div"); d.className = "frow"; d.innerHTML = html + ` <button type="button" class="btn ghost" data-del>✕</button>`; return d; }
+const compRow = (name="", weight="") => row(`<input placeholder="Midterm" value="${esc(name)}" data-f="name" style="width:180px"><input type="number" step="any" placeholder="wt %" value="${esc(weight)}" data-f="weight" class="sm">`);
+const topicRow = (title="", id="") => row(`<input placeholder="Limits and continuity" value="${esc(title)}" data-f="title" style="width:280px"><input placeholder="id (auto)" value="${esc(id)}" data-f="id" style="width:110px">`);
+const examRow = (name="", date="") => row(`<input placeholder="Final" value="${esc(name)}" data-f="name" style="width:140px"><input type="date" value="${esc(date)}" data-f="date">`);
+
+$("#addComp").onclick = () => $("#compRows").append(compRow());
+$("#addTopic").onclick = () => $("#topicRows").append(topicRow());
+$("#addExam").onclick = () => $("#examRows").append(examRow());
+$("#courseForm").addEventListener("click", e => { if (e.target.dataset.del !== undefined && e.target.hasAttribute("data-del")) { e.target.parentElement.remove(); updateWeightSum(); } });
+$("#courseForm").addEventListener("input", updateWeightSum);
+
+function updateWeightSum() {
+  const sum = $$('#compRows [data-f="weight"]').reduce((a, i) => a + (parseFloat(i.value) || 0), 0);
+  const el = $("#weightSum");
+  el.textContent = `sum: ${+sum.toFixed(2)}%`;
+  el.className = Math.abs(sum - 100) < 0.01 ? "hint" : "hint bad";
+}
+function rowsData(host, fields) {
+  return $$(".frow", host).map(r => Object.fromEntries(fields.map(f => [f, $(`[data-f="${f}"]`, r)?.value ?? ""])));
+}
+function fillEditor(c) {
+  $("#editorTitle").textContent = c ? `Edit: ${c.name}` : "Add a course";
+  $("#cName").value = c?.name || ""; $("#cCode").value = c?.code || "";
+  $("#cTerm").value = c?.term || "fall"; $("#cCutoff").value = c?.aplus_cutoff ?? 90;
+  $("#compRows").replaceChildren(...(c?.components || [{name:"",weight:""}]).map(x => compRow(x.name, x.weight)));
+  $("#topicRows").replaceChildren(...(c?.topics || [{}]).map(t => topicRow(t.title || "", t.id || "")));
+  $("#examRows").replaceChildren(...(c?.exams || []).map(x => examRow(x.name, x.date)));
+  updateWeightSum();
+}
+$("#editTarget").addEventListener("change", e => {
+  fillEditor(DATA.courses.find(c => c.id === e.target.value) || null);
+});
+$("#courseForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const body = {
+    name: $("#cName").value, code: $("#cCode").value, term: $("#cTerm").value,
+    aplus_cutoff: $("#cCutoff").value,
+    components: rowsData($("#compRows"), ["name","weight"]),
+    topics: rowsData($("#topicRows"), ["title","id"]),
+    exams: rowsData($("#examRows"), ["name","date"]),
+  };
+  const target = $("#editTarget").value;
+  const r = target ? await api(`/api/courses/${target}`, "PUT", body) : await api("/api/courses", "POST", body);
+  toast(`Saved ${body.name} (${r.id})`);
+  await refresh(false);
+  $("#editTarget").value = r.id;
+});
+
+/* ---------- projects ---------- */
+function renderProjects() {
+  const host = $("#projects");
+  if (!PROJECTS.length) { host.innerHTML = `<div class="empty">No side projects yet.</div>`; return; }
+  host.innerHTML = PROJECTS.map(p => {
+    const done = p.tasks.filter(t => t.done).length;
+    const tasks = p.tasks.map((t, i) => `
+      <label class="task ${t.done ? "done" : ""}"><input type="checkbox" data-i="${i}" ${t.done ? "checked" : ""}><span>${esc(t.title)}</span></label>`).join("");
+    return `<div class="card projcard" data-project="${esc(p.id)}">
+      <div class="frow" style="justify-content:space-between">
+        <h3>${esc(p.name)}</h3>
+        <select class="status-pill ${esc(p.status)}" data-status>
+          ${["active","paused","done"].map(s => `<option ${s===p.status?"selected":""}>${s}</option>`).join("")}
+        </select>
+      </div>
+      <div class="meta">${done}/${p.tasks.length} tasks · <b>${Math.round(100*done/Math.max(p.tasks.length,1))}%</b></div>
+      <div class="bar"><i style="width:${100*done/Math.max(p.tasks.length,1)}%"></i></div>
+      <div>${tasks}</div>
+      <div class="frow">
+        <input placeholder="New task" data-newtask style="flex:1">
+        <button class="btn" data-addtask>Add</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+async function saveProject(card) {
+  const p = PROJECTS.find(x => x.id === card.dataset.project);
+  await api(`/api/projects/${p.id}`, "PUT", p);
+  renderProjects();
+}
+$("#projects").addEventListener("change", async e => {
+  const card = e.target.closest(".projcard"); if (!card) return;
+  const p = PROJECTS.find(x => x.id === card.dataset.project);
+  if (e.target.hasAttribute("data-status")) p.status = e.target.value;
+  else if (e.target.dataset.i !== undefined) p.tasks[+e.target.dataset.i].done = e.target.checked;
+  await saveProject(card);
+});
+$("#projects").addEventListener("click", async e => {
+  if (!e.target.hasAttribute("data-addtask")) return;
+  const card = e.target.closest(".projcard");
+  const input = $("[data-newtask]", card);
+  if (!input.value.trim()) return;
+  PROJECTS.find(x => x.id === card.dataset.project).tasks.push({ title: input.value.trim(), done: false });
+  await saveProject(card);
+});
+$("#npAdd").onclick = async () => {
+  const name = $("#npName").value.trim(); if (!name) return;
+  await api("/api/projects", "POST", { name, status: "active", tasks: [] });
+  $("#npName").value = ""; toast(`Added ${name}`);
+  await refresh(false);
+};
+
+/* ---------- hours ---------- */
+function renderHours() {
+  const names = [...DATA.courses.map(c => c.id), ...PROJECTS.map(p => p.id)];
+  $("#logName").innerHTML = names.map(n => `<option>${esc(n)}</option>`).join("");
+  const rows = Object.entries(DATA.hours).sort((a,b) => b[1]-a[1]);
+  $("#hoursBody").innerHTML = rows.length
+    ? rows.map(([n,h]) => `<tr><td>${esc(n)}</td><td>${h}</td></tr>`).join("")
+    : `<tr><td colspan="2" class="empty">Nothing logged yet.</td></tr>`;
+}
+$("#logAdd").onclick = async () => {
+  const hours = $("#logHours").value; if (!hours) return;
+  const r = await api("/api/log", "POST", { name: $("#logName").value, hours });
+  toast(`Logged ${hours}h (total ${r.total}h)`); $("#logHours").value = "";
+  await refresh(false);
+};
+
+$("#regen").onclick = async () => { const r = await api("/api/dashboard", "POST"); toast("Static dashboard rebuilt"); };
+
+/* ---------- load ---------- */
+async function refresh(resetEditor=true) {
+  [DATA, PROJECTS] = await Promise.all([api("/api/overview"), api("/api/projects")]);
+  renderOverview(); renderProjects(); renderHours();
+  const sel = $("#editTarget"), cur = sel.value;
+  sel.innerHTML = `<option value="">— new course —</option>` +
+    DATA.courses.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
+  sel.value = cur;
+  if (resetEditor) fillEditor(null);
+}
+refresh();
+</script>
+</body>
+</html>

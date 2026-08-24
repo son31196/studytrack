@@ -1,0 +1,39 @@
+name: Linear Algebra with Numerical Analysis for Engineers
+code: NMM 1411B
+term: winter  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Assignments
+    weight: 15
+  - name: Quizzes
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2027-02-26
+  - name: Final
+    date: 2027-04-16
+
+topics:
+  - id: complex-numbers
+    title: "Complex numbers"
+  - id: vectors-and-geometry-in-r-n
+    title: "Vectors and geometry in R^n"
+  - id: linear-systems-and-gaussian-elimination
+    title: "Linear systems and Gaussian elimination"
+  - id: matrix-algebra-and-inverses
+    title: "Matrix algebra and inverses"
+  - id: determinants
+    title: "Determinants"
+  - id: vector-spaces-and-subspaces
+    title: "Vector spaces and subspaces"
+  - id: eigenvalues-and-eigenvectors
+    title: "Eigenvalues and eigenvectors"
+  - id: numerical-methods-and-floating-point-err
+    title: "Numerical methods and floating-point error"

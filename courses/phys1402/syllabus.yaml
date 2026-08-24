@@ -1,0 +1,37 @@
+name: Physics for Engineering Students II
+code: PHYS 1402B
+term: winter  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Labs
+    weight: 15
+  - name: Assignments
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2027-02-26
+  - name: Final
+    date: 2027-04-16
+
+topics:
+  - id: electric-charge-and-electric-fields
+    title: "Electric charge and electric fields"
+  - id: electric-potential-and-capacitance
+    title: "Electric potential and capacitance"
+  - id: dc-circuits
+    title: "DC circuits"
+  - id: magnetic-fields-and-forces
+    title: "Magnetic fields and forces"
+  - id: electromagnetic-induction
+    title: "Electromagnetic induction"
+  - id: waves-and-sound
+    title: "Waves and sound"
+  - id: geometric-and-wave-optics
+    title: "Geometric and wave optics"

@@ -17,6 +17,7 @@ export ANTHROPIC_API_KEY=sk-ant-...   # needed only for `study quiz`
 ## Daily use
 
 ```bash
+python study.py ui                          # interactive web UI at localhost:5000
 python study.py status                      # where am I? what should I study now?
 python study.py quiz example-course         # quiz on the weakest due topic
 python study.py quiz example-course --topic limits -n 5

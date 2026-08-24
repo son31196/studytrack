@@ -1,0 +1,37 @@
+name: Business for Engineers
+code: BUS 1299E
+term: full-year  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Cases and reports
+    weight: 30
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 40
+
+exams:
+  - name: Midterm
+    date: 2026-12-14
+  - name: Final
+    date: 2027-04-16
+
+topics:
+  - id: financial-accounting-and-statements
+    title: "Financial accounting and statements"
+  - id: managerial-accounting-and-costing
+    title: "Managerial accounting and costing"
+  - id: marketing-fundamentals
+    title: "Marketing fundamentals"
+  - id: operations-management
+    title: "Operations management"
+  - id: finance-and-investment-decisions
+    title: "Finance and investment decisions"
+  - id: strategy-and-competitive-analysis
+    title: "Strategy and competitive analysis"
+  - id: entrepreneurship-and-business-plans
+    title: "Entrepreneurship and business plans"
+  - id: leadership-and-organizational-behaviour
+    title: "Leadership and organizational behaviour"

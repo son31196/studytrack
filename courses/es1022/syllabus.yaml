@@ -1,0 +1,41 @@
+name: Engineering Statics
+code: ES 1022Y
+term: full-year  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Assignments
+    weight: 10
+  - name: Quizzes
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 50
+
+exams:
+  - name: Midterm
+    date: 2026-12-14
+  - name: Final
+    date: 2027-04-16
+
+topics:
+  - id: force-vectors
+    title: "Force vectors"
+  - id: equilibrium-of-a-particle
+    title: "Equilibrium of a particle"
+  - id: moments-and-couples
+    title: "Moments and couples"
+  - id: rigid-body-equilibrium
+    title: "Rigid-body equilibrium"
+  - id: trusses-frames-and-machines
+    title: "Trusses, frames, and machines"
+  - id: centroids-and-centre-of-gravity
+    title: "Centroids and centre of gravity"
+  - id: moments-of-inertia
+    title: "Moments of inertia"
+  - id: friction
+    title: "Friction"
+  - id: internal-forces-and-shear-bending-moment
+    title: "Internal forces and shear/bending-moment diagrams"

@@ -105,6 +105,12 @@ def cmd_project(args):
             print(f"    [{'x' if t.get('done') else ' '}] {t.get('title')}")
 
 
+def cmd_ui(args):
+    from . import webapp  # imported lazily so other commands work without Flask
+
+    webapp.run(port=args.port)
+
+
 def cmd_dashboard(args):
     out = dashboard.write()
     print(f"Dashboard written to {out}")
@@ -147,6 +153,10 @@ def main():
     p = sub.add_parser("project", help="side projects board")
     p.add_argument("action", nargs="?", default="list")
     p.set_defaults(func=cmd_project)
+
+    p = sub.add_parser("ui", help="launch the local web UI")
+    p.add_argument("--port", type=int, default=5000)
+    p.set_defaults(func=cmd_ui)
 
     sub.add_parser("dashboard", help="regenerate docs/index.html").set_defaults(func=cmd_dashboard)
     sub.add_parser("sync", help="git pull --rebase, commit, push").set_defaults(func=cmd_sync)

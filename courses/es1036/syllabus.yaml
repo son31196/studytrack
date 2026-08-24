@@ -1,0 +1,39 @@
+name: Programming Fundamentals for Engineers
+code: ES 1036A
+term: fall  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Labs
+    weight: 15
+  - name: Assignments
+    weight: 15
+  - name: Midterm
+    weight: 25
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2026-10-30
+  - name: Final
+    date: 2026-12-14
+
+topics:
+  - id: variables-types-and-expressions
+    title: "Variables, types, and expressions"
+  - id: control-flow-conditionals-and-loops
+    title: "Control flow: conditionals and loops"
+  - id: functions-and-scope
+    title: "Functions and scope"
+  - id: arrays-and-strings
+    title: "Arrays and strings"
+  - id: pointers-and-dynamic-memory
+    title: "Pointers and dynamic memory"
+  - id: structs-classes-and-object-oriented-basi
+    title: "Structs, classes, and object-oriented basics"
+  - id: file-input-output
+    title: "File input/output"
+  - id: searching-sorting-and-debugging
+    title: "Searching, sorting, and debugging"

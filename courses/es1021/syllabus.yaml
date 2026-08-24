@@ -1,0 +1,39 @@
+name: Properties of Materials in Engineering
+code: ES 1021B
+term: winter  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Labs
+    weight: 15
+  - name: Quizzes
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2027-02-26
+  - name: Final
+    date: 2027-04-16
+
+topics:
+  - id: atomic-bonding-and-crystal-structures
+    title: "Atomic bonding and crystal structures"
+  - id: crystalline-imperfections-and-diffusion
+    title: "Crystalline imperfections and diffusion"
+  - id: mechanical-properties-and-testing
+    title: "Mechanical properties and testing"
+  - id: failure-fracture-fatigue-and-creep
+    title: "Failure: fracture, fatigue, and creep"
+  - id: phase-diagrams-and-heat-treatment
+    title: "Phase diagrams and heat treatment"
+  - id: metals-polymers-ceramics-and-composites
+    title: "Metals, polymers, ceramics, and composites"
+  - id: electrical-properties-of-materials
+    title: "Electrical properties of materials"
+  - id: corrosion-and-degradation
+    title: "Corrosion and degradation"

@@ -1,0 +1,41 @@
+name: Chemistry for Engineers
+code: CHEM 1302A
+term: fall  # guess for A/B sections — flip in the UI if your section differs
+aplus_cutoff: 90  # Western A+ = 90%
+
+# PLACEHOLDER weights/dates — edit to match your section's real course outline.
+components:
+  - name: Labs
+    weight: 15
+  - name: Assignments
+    weight: 10
+  - name: Midterm
+    weight: 30
+  - name: Final
+    weight: 45
+
+exams:
+  - name: Midterm
+    date: 2026-10-30
+  - name: Final
+    date: 2026-12-14
+
+topics:
+  - id: stoichiometry-and-chemical-reactions
+    title: "Stoichiometry and chemical reactions"
+  - id: atomic-structure-and-periodicity
+    title: "Atomic structure and periodicity"
+  - id: chemical-bonding-and-molecular-structure
+    title: "Chemical bonding and molecular structure"
+  - id: gases-and-states-of-matter
+    title: "Gases and states of matter"
+  - id: thermochemistry
+    title: "Thermochemistry"
+  - id: thermodynamics-entropy-and-free-energy
+    title: "Thermodynamics: entropy and free energy"
+  - id: chemical-kinetics
+    title: "Chemical kinetics"
+  - id: equilibrium
+    title: "Equilibrium"
+  - id: electrochemistry-and-corrosion
+    title: "Electrochemistry and corrosion"
