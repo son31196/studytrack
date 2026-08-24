@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StudyTrack</title>
+<title>Progress trackers</title>
 <style>
   :root {
     color-scheme: light;
@@ -146,8 +146,8 @@
 </head>
 <body>
 <main>
-  <div id="banner"></div>
   <div class="topbar">
+    <h1>Progress trackers</h1>
     <span class="date" id="today"></span>
     <span class="spacer"></span>
     <button class="btn" id="regen" title="Rebuild docs/index.html for GitHub Pages">Rebuild static dashboard</button>
@@ -238,7 +238,7 @@
 "use strict";
 const $ = (sel, el=document) => el.querySelector(sel);
 const $$ = (sel, el=document) => [...el.querySelectorAll(sel)];
-let DATA = null, PROJECTS = [], TODOS = [], GCAL = { connected: false, events: [] }, BANNER_READY = false;
+let DATA = null, PROJECTS = [], TODOS = [], GCAL = { connected: false, events: [] };
 
 function toast(msg, ms=2200) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
@@ -259,14 +259,8 @@ $("#tabs").addEventListener("click", e => {
   ["planner","overview","editor","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
 });
 
-/* ---------- planner: banner charge, calendar, todos ---------- */
-function doneCount() {
-  return TODOS.filter(t => t.done).length +
-    PROJECTS.reduce((a, p) => a + p.tasks.filter(t => t.done).length, 0);
-}
-function renderPlanner(animate) {
-  if (!BANNER_READY) { Planner.mountBanner($("#banner"), { done: doneCount() }); BANNER_READY = true; }
-  else Planner.setCharge(doneCount(), { animate });
+/* ---------- planner: calendar + todos ---------- */
+function renderPlanner() {
   const events = [];
   DATA.courses.forEach(c => (c.exams || []).forEach(e =>
     events.push({ date: e.date, label: `${c.code || c.id} ${e.name}`, type: "exam" })));
@@ -453,7 +447,7 @@ function renderProjects() {
 async function saveProject(card) {
   const p = PROJECTS.find(x => x.id === card.dataset.project);
   await api(`/api/projects/${p.id}`, "PUT", p);
-  renderProjects(); renderPlanner(true);
+  renderProjects();
 }
 $("#projects").addEventListener("change", async e => {
   const card = e.target.closest(".projcard"); if (!card) return;
@@ -527,7 +521,7 @@ function renderGcalPanel() {
 async function refresh(resetEditor=true) {
   [DATA, PROJECTS, TODOS, GCAL] = await Promise.all([
     api("/api/overview"), api("/api/projects"), api("/api/todos"), api("/api/gcal/events")]);
-  renderPlanner(!resetEditor); renderOverview(); renderProjects(); renderHours();
+  renderPlanner(); renderOverview(); renderProjects(); renderHours();
   const sel = $("#editTarget"), cur = sel.value;
   sel.innerHTML = `<option value="">— new course —</option>` +
     DATA.courses.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");

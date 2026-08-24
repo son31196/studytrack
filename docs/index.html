@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StudyTrack</title>
+<title>Progress trackers</title>
 <style>
   :root {
     color-scheme: light;
@@ -89,8 +89,8 @@
 </head>
 <body>
 <main>
-  <div id="banner"></div>
   <div class="topbar">
+    <h1>Progress trackers</h1>
     <span class="date" id="today"></span>
     <span class="spacer"></span>
     <span class="ro">read-only · edit with <b>study.py ui</b>, publish with <b>study.py sync</b></span>
@@ -226,9 +226,6 @@ if (DATA.study_next) {
 }
 renderCourses(); renderProjects(); renderHours();
 
-const doneCount = DATA.todos.filter(t => t.done).length +
-  DATA.projects.reduce((a, p) => a + p.tasks.filter(t => t.done).length, 0);
-Planner.mountBanner($("#banner"), { done: doneCount });
 const events = [];
 DATA.courses.forEach(c => (c.exams || []).forEach(e =>
   events.push({ date: e.date, label: `${c.code || c.id} ${e.name}`, type: "exam" })));
