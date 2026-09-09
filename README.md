@@ -1,8 +1,8 @@
-# StudyTrack — Semester A+ System
+# Study Track System
 
 Personal progress-tracking + AI-quizzing system for the semester. Three modules:
 
-1. **Course tracker** — syllabus topics, per-topic mastery scores, grades, and "what score do I need for A+".
+1. **Course tracker** — syllabus topics, per-topic mastery scores, grades, and "what score do I need for".
 2. **Side project tracker** — lightweight project boards so projects don't eat study time invisibly.
 3. **Generative testing engine** — Claude-generated quizzes from your own notes; grading feeds back into mastery + spaced repetition.
 
