@@ -1,0 +1,28 @@
+# Render blueprint: public, read-only StudyTrack with a private editor login.
+# Create the service at https://render.com → New → Blueprint, point it at this
+# repo, then set STUDYTRACK_PASSWORD (and optionally STUDYTRACK_GCAL_URL) in the
+# dashboard. Both are marked sync:false so they never live in git.
+services:
+  - type: web
+    name: studytrack
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn studytrack.webapp:app --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.6"
+      # Editor password. Set this in the Render dashboard — without it the site
+      # would be world-writable.
+      - key: STUDYTRACK_PASSWORD
+        sync: false
+      # Signs the login cookie. Generated once by Render and kept across deploys
+      # so logging in survives a restart.
+      - key: STUDYTRACK_SECRET_KEY
+        generateValue: true
+      # Marks the session cookie Secure; Render terminates TLS for us.
+      - key: STUDYTRACK_HTTPS
+        value: "1"
+      # Optional: the secret iCal feed, which has no writable file on Render.
+      - key: STUDYTRACK_GCAL_URL
+        sync: false

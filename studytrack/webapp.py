@@ -1,16 +1,49 @@
 """Local web UI: JSON API over the same files the CLI uses. Run via `python study.py ui`."""
+import os
 import re
 from datetime import date
 from pathlib import Path
 
 import yaml
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, jsonify, request, send_from_directory, session
 
-from . import dashboard, grades, mastery, store
+from . import auth, dashboard, grades, mastery, store
 
 WEBUI_DIR = Path(__file__).resolve().parent / "webui"
 
 app = Flask(__name__)
+# Signing key for the login cookie. Random per boot when unset, which is fine
+# locally (no login needed) but logs editors out on every restart in public
+# mode — so deployments should set it.
+app.secret_key = os.environ.get("STUDYTRACK_SECRET_KEY") or os.urandom(32)
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=bool(os.environ.get("STUDYTRACK_HTTPS", "")),
+)
+app.before_request(auth.guard)
+
+
+@app.get("/api/session")
+def session_state():
+    return jsonify({"can_edit": auth.can_edit(), "public": auth.is_public()})
+
+
+@app.post("/api/session")
+def session_login():
+    candidate = (request.get_json(force=True).get("password") or "").strip()
+    ok, err = auth.attempt_login(candidate)
+    if not ok:
+        return jsonify({"error": err}), 401
+    session["editor"] = True
+    session.permanent = True
+    return jsonify({"can_edit": True, "public": True})
+
+
+@app.delete("/api/session")
+def session_logout():
+    session.pop("editor", None)
+    return jsonify({"can_edit": auth.can_edit(), "public": auth.is_public()})
 
 
 def _slug(text: str) -> str:
@@ -26,6 +59,16 @@ def index():
 
 
 GCAL_FILE = store.ROOT / ".gcal-url"
+
+
+def _gcal_url() -> str:
+    """Secret ICS feed: env var first (deployments have no writable file)."""
+    env = os.environ.get("STUDYTRACK_GCAL_URL", "").strip()
+    if env:
+        return env
+    return GCAL_FILE.read_text().strip() if GCAL_FILE.exists() else ""
+
+
 _gcal_cache = {"at": 0.0, "events": None}
 
 
@@ -35,7 +78,7 @@ def gcal_events():
 
     from . import gcal
 
-    if not GCAL_FILE.exists():
+    if not _gcal_url():
         return jsonify({"connected": False, "events": []})
     if _gcal_cache["events"] is not None and time.time() - _gcal_cache["at"] < 600:
         return jsonify({"connected": True, "events": _gcal_cache["events"]})
@@ -43,7 +86,7 @@ def gcal_events():
         from datetime import timedelta
 
         today = date.today()
-        ics = gcal.fetch(GCAL_FILE.read_text().strip())
+        ics = gcal.fetch(_gcal_url())
         events = gcal.events_between(ics, today - timedelta(days=60), today + timedelta(days=240))
     except Exception as e:
         return jsonify({"connected": True, "events": [], "error": f"Google Calendar fetch failed: {e}"})
