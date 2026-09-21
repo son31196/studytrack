@@ -20,18 +20,4 @@ exams:
   - name: Final
     date: 2027-04-16
 
-topics:
-  - id: electric-charge-and-electric-fields
-    title: "Electric charge and electric fields"
-  - id: electric-potential-and-capacitance
-    title: "Electric potential and capacitance"
-  - id: dc-circuits
-    title: "DC circuits"
-  - id: magnetic-fields-and-forces
-    title: "Magnetic fields and forces"
-  - id: electromagnetic-induction
-    title: "Electromagnetic induction"
-  - id: waves-and-sound
-    title: "Waves and sound"
-  - id: geometric-and-wave-optics
-    title: "Geometric and wave optics"
+topics: []

@@ -153,6 +153,7 @@ def overview():
                 "name": syl.get("name", course),
                 "code": syl.get("code", ""),
                 "term": syl.get("term", ""),
+                "year": syl.get("year"),
                 "aplus_cutoff": syl.get("aplus_cutoff", grades.DEFAULT_APLUS_CUTOFF),
                 "components": syl.get("components", []),
                 "exams": [
@@ -181,12 +182,15 @@ def overview():
     return jsonify({"today": today, "courses": courses, "study_next": best_pick, "hours": hours})
 
 
-def _syllabus_from_request(body: dict) -> dict:
+def _syllabus_from_request(body: dict, existing: dict | None = None) -> dict:
+    year = body.get("year") or (existing or {}).get("year")
     syl = {
         "name": body["name"].strip(),
         "code": body.get("code", "").strip(),
         "term": body.get("term", "").strip(),
-        "aplus_cutoff": float(body.get("aplus_cutoff", 90)),
+        "year": int(year) if year else None,  # academic year start; dropped when unset
+        # not editable in the UI: keep the course's own value, fall back to the Western A+ line
+        "aplus_cutoff": float(body.get("aplus_cutoff", (existing or {}).get("aplus_cutoff", 90))),
         "components": [
             {"name": c["name"].strip(), "weight": float(c["weight"])}
             for c in body.get("components", [])
@@ -203,6 +207,8 @@ def _syllabus_from_request(body: dict) -> dict:
             if t.get("title", "").strip()
         ],
     }
+    if syl["year"] is None:
+        del syl["year"]
     total = sum(c["weight"] for c in syl["components"])
     if syl["components"] and abs(total - 100) > 0.01:
         raise ValueError(f"component weights sum to {total:g}, not 100")
@@ -234,7 +240,7 @@ def update_course(course_id):
     if not (store.COURSES_DIR / course_id / "syllabus.yaml").exists():
         return jsonify({"error": f"no such course: {course_id}"}), 404
     try:
-        syl = _syllabus_from_request(request.get_json(force=True))
+        syl = _syllabus_from_request(request.get_json(force=True), store.load_syllabus(course_id))
     except (KeyError, ValueError) as e:
         return jsonify({"error": str(e)}), 400
     _write_syllabus(course_id, syl)

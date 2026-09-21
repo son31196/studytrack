@@ -20,18 +20,4 @@ exams:
   - name: Final
     date: 2026-12-14
 
-topics:
-  - id: limits-and-continuity
-    title: "Limits and continuity"
-  - id: derivatives-and-differentiation-rules
-    title: "Derivatives and differentiation rules"
-  - id: implicit-and-logarithmic-differentiation
-    title: "Implicit and logarithmic differentiation"
-  - id: related-rates-and-optimization
-    title: "Related rates and optimization"
-  - id: curve-sketching-and-l-hopital-s-rule
-    title: "Curve sketching and l'Hopital's rule"
-  - id: antiderivatives-and-the-definite-integra
-    title: "Antiderivatives and the definite integral"
-  - id: the-fundamental-theorem-of-calculus
-    title: "The fundamental theorem of calculus"
+topics: []

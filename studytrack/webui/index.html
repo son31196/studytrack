@@ -79,12 +79,35 @@
     font-size: 11px; font-weight: 600; color: var(--ink-2);
     border: 1px solid var(--hairline); border-radius: 999px; padding: 1px 8px; white-space: nowrap;
   }
+  button.sem-card {
+    appearance: none; font: inherit; color: inherit; text-align: left; cursor: pointer;
+    gap: 12px;
+  }
+  button.sem-card:hover { border-color: var(--accent); }
+  button.sem-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.sem-card .go { color: var(--accent-deep); font-size: 13px; font-weight: 600; }
+  .codes { display: flex; flex-wrap: wrap; gap: 6px; }
+  .crumb { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .crumb h2 { font-size: 17px; font-weight: 700; }
+  .crumb .count { color: var(--muted); font-size: 13px; }
+
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 14px; align-items: start; }
+  .card h4 { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .compline { display: grid; grid-template-columns: 1fr 46px 100px 40px; gap: 10px; align-items: center; font-size: 13px; }
+  .compline .t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .compline .w { color: var(--muted); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+  .compline .pct { color: var(--muted); font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; }
+  .entries { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 6px; }
+  .entries span { font-size: 11.5px; color: var(--ink-2); border: 1px solid var(--hairline); border-radius: 999px; padding: 1px 8px; }
+  .examline { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--hairline); }
+  .examline:last-child { border-bottom: none; }
+  .examline.past { color: var(--muted); text-decoration: line-through; }
+  .examline .cd { font-variant-numeric: tabular-nums; color: var(--ink-2); white-space: nowrap; }
+  .examline .cd.soon { color: var(--critical); font-weight: 600; }
+
   .statrow { display: flex; gap: 22px; }
   .stat .v { font-size: 22px; font-weight: 700; }
   .stat .l { font-size: 11.5px; color: var(--muted); }
-  .need { font-size: 13px; color: var(--ink-2); }
-  .need.out { color: var(--critical); font-weight: 600; }
-  .need .ok { color: var(--good-text); font-weight: 600; }
 
   .bar { height: 6px; border-radius: 4px; background: var(--track); overflow: hidden; }
   .bar > i { display: block; height: 100%; border-radius: 4px; background: var(--accent); }
@@ -156,7 +179,6 @@
   <nav class="tabs" id="tabs">
     <button data-tab="planner" class="on">Planner</button>
     <button data-tab="overview">Courses</button>
-    <button data-tab="editor">Add / edit course</button>
     <button data-tab="projects">Side projects</button>
     <button data-tab="hours">Hours</button>
   </nav>
@@ -173,46 +195,61 @@
 
   <section id="tab-overview" hidden>
     <div class="banner" id="studynext" hidden></div>
-    <div class="grid" id="courses"></div>
+    <div id="semList">
+      <div class="frow" style="margin-bottom:16px">
+        <button class="btn primary" id="addCourseBtn">+ Add course</button>
+        <span class="hint">Name, weights, exam dates and topics — saved straight to the syllabus.</span>
+      </div>
+      <div class="grid" id="semesters"></div>
+    </div>
+    <div id="semDetail" hidden>
+      <div class="crumb">
+        <button class="btn ghost" id="semBack">← All semesters</button>
+        <h2 id="semTitle"></h2><span class="count" id="semCount"></span>
+      </div>
+      <div class="grid" id="courses"></div>
+    </div>
+    <div id="courseDetail" hidden></div>
+    <div id="editorPane" hidden>
+      <div class="crumb">
+        <button class="btn ghost" id="editorCancel">← Back</button>
+        <h2 id="editorTitle">Add a course</h2>
+      </div>
+      <form class="editor" id="courseForm">
+        <div class="frow">
+          <label class="fcol"><span>Name</span><input id="cName" required placeholder="Calculus for Engineers I" style="width:260px"></label>
+          <label class="fcol"><span>Code</span><input id="cCode" placeholder="NMM 1412A" style="width:120px"></label>
+        </div>
+        <div class="frow">
+          <label class="fcol"><span>Term</span>
+            <select id="cTerm"><option value="fall">Fall</option><option value="winter">Winter</option><option value="full-year">Full year</option></select>
+          </label>
+          <label class="fcol"><span>Year</span><input id="cYear" type="number" min="2000" max="2100" step="1" class="sm"></label>
+          <span class="hint" style="align-self:flex-end">the year that term runs in — a full-year course takes its starting year</span>
+        </div>
+        <fieldset id="fsComponents">
+          <legend>Graded components (weights must sum to 100)</legend>
+          <div id="compRows"></div>
+          <div class="frow"><button type="button" class="btn ghost" id="addComp">+ add component</button><span class="hint" id="weightSum"></span></div>
+        </fieldset>
+        <fieldset id="fsTopics">
+          <legend>Topics (drive mastery tracking & quizzes)</legend>
+          <div id="topicRows"></div>
+          <button type="button" class="btn ghost" id="addTopic" style="align-self:flex-start">+ add topic</button>
+        </fieldset>
+        <fieldset id="fsExams">
+          <legend>Exam dates</legend>
+          <div id="examRows"></div>
+          <button type="button" class="btn ghost" id="addExam" style="align-self:flex-start">+ add exam</button>
+        </fieldset>
+        <div class="frow">
+          <button class="btn primary" type="submit" id="saveCourse">Save course</button>
+          <span class="hint">Writes courses/&lt;id&gt;/syllabus.yaml — the CLI and /quiz see it immediately.</span>
+        </div>
+      </form>
+    </div>
   </section>
 
-  <section id="tab-editor" hidden>
-    <form class="editor" id="courseForm">
-      <h2 id="editorTitle">Add a course</h2>
-      <div class="frow">
-        <label class="fcol"><span>Editing</span>
-          <select id="editTarget"><option value="">— new course —</option></select>
-        </label>
-        <label class="fcol"><span>Name</span><input id="cName" required placeholder="Calculus for Engineers I" style="width:260px"></label>
-        <label class="fcol"><span>Code</span><input id="cCode" placeholder="NMM 1412A" style="width:120px"></label>
-      </div>
-      <div class="frow">
-        <label class="fcol"><span>Term</span>
-          <select id="cTerm"><option value="fall">Fall</option><option value="winter">Winter</option><option value="full-year">Full year</option></select>
-        </label>
-        <label class="fcol"><span>A+ cutoff %</span><input id="cCutoff" type="number" step="0.5" value="90" class="sm"></label>
-      </div>
-      <fieldset id="fsComponents">
-        <legend>Graded components (weights must sum to 100)</legend>
-        <div id="compRows"></div>
-        <div class="frow"><button type="button" class="btn ghost" id="addComp">+ add component</button><span class="hint" id="weightSum"></span></div>
-      </fieldset>
-      <fieldset id="fsTopics">
-        <legend>Topics (drive mastery tracking & quizzes)</legend>
-        <div id="topicRows"></div>
-        <button type="button" class="btn ghost" id="addTopic" style="align-self:flex-start">+ add topic</button>
-      </fieldset>
-      <fieldset id="fsExams">
-        <legend>Exam dates</legend>
-        <div id="examRows"></div>
-        <button type="button" class="btn ghost" id="addExam" style="align-self:flex-start">+ add exam</button>
-      </fieldset>
-      <div class="frow">
-        <button class="btn primary" type="submit" id="saveCourse">Save course</button>
-        <span class="hint">Writes courses/&lt;id&gt;/syllabus.yaml — the CLI and /quiz see it immediately.</span>
-      </div>
-    </form>
-  </section>
 
   <section id="tab-projects" hidden>
     <div class="frow" style="margin-bottom:16px">
@@ -256,7 +293,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 $("#tabs").addEventListener("click", e => {
   const btn = e.target.closest("button"); if (!btn) return;
   $$("#tabs button").forEach(b => b.classList.toggle("on", b === btn));
-  ["planner","overview","editor","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
+  ["planner","overview","projects","hours"].forEach(t => $("#tab-"+t).hidden = t !== btn.dataset.tab);
 });
 
 /* ---------- planner: calendar + todos ---------- */
@@ -282,8 +319,87 @@ function termChip(term) {
   const label = {fall:"Fall", winter:"Winter", "full-year":"Full year"}[term] || term;
   return term ? `<span class="chip">${esc(label)}</span>` : "";
 }
+const TERM_ORDER = { fall: 0, "full-year": 1, winter: 2 };
+let SEMESTER = null;  // group key currently drilled into, null = semester index
+let COURSE = null;    // course id currently opened, null = semester's course list
+let EDITING = null;   // "" = adding, course id = editing that course, null = not in the editor
+
+function daysUntil(iso) {
+  return Math.round((new Date(iso + "T00:00:00") - new Date(DATA.today + "T00:00:00")) / 864e5);
+}
+/* Academic year a course sits in, named by the year its fall term starts.
+   Taken from the earliest exam date (Jul–Dec = start year, Jan–Jun = the year after). */
+function startYear(c) {
+  if (c.year) return c.term === "winter" ? +c.year - 1 : +c.year;
+  const dates = (c.exams || []).map(e => e.date).filter(Boolean).sort();
+  const ref = dates[0] || DATA.today;
+  const y = +ref.slice(0, 4), mo = +ref.slice(5, 7);
+  return mo >= 7 ? y : y - 1;
+}
+function semesterOf(c) {
+  const y = startYear(c), term = c.term || "unscheduled";
+  const label = {
+    fall: `Fall ${y}`,
+    winter: `Winter ${y + 1}`,
+    "full-year": `Full year ${y}–${String(y + 1).slice(2)}`,
+  }[term] || `${term} ${y}`;
+  return { key: `${term}|${y}`, term, year: y, label };
+}
+function semesterGroups() {
+  const by = new Map();
+  DATA.courses.forEach(c => {
+    const s = semesterOf(c);
+    if (!by.has(s.key)) by.set(s.key, { ...s, courses: [] });
+    by.get(s.key).courses.push(c);
+  });
+  return [...by.values()].sort((a, b) =>
+    a.year - b.year || (TERM_ORDER[a.term] ?? 9) - (TERM_ORDER[b.term] ?? 9));
+}
+function nextExamIn(courses) {
+  return courses
+    .flatMap(c => (c.exams || []).map(e => ({ days: daysUntil(e.date), label: `${c.code || c.id} ${e.name}` })))
+    .filter(e => e.days >= 0)
+    .sort((a, b) => a.days - b.days)[0] || null;
+}
+
+function renderSemesterCards(groups) {
+  const host = $("#semesters");
+  if (!groups.length) { host.innerHTML = `<div class="empty">No courses yet — add one with <b>+ Add course</b>.</div>`; return; }
+  host.innerHTML = groups.map(g => {
+    const n = g.courses.length;
+    const avg = Math.round(g.courses.reduce((s, c) => s + (c.mastery.avg_mastery || 0), 0) / n * 10) / 10;
+    const due = g.courses.reduce((s, c) => s + c.mastery.topics_due.length, 0);
+    const exam = nextExamIn(g.courses);
+    const codes = g.courses.map(c => `<span class="chip">${esc(c.code || c.id)}</span>`).join("");
+    return `<button class="card sem-card" data-sem="${esc(g.key)}">
+      <div class="frow" style="justify-content:space-between">
+        <h3>${esc(g.label)}</h3><span class="chip">${n} course${n === 1 ? "" : "s"}</span>
+      </div>
+      <div class="statrow">
+        <div class="stat"><div class="v">${avg}%</div><div class="l">avg mastery</div></div>
+        <div class="stat"><div class="v">${due}</div><div class="l">topics due</div></div>
+        <div class="stat"><div class="v">${exam ? exam.days + "d" : "—"}</div><div class="l">${exam ? esc(exam.label) : "no exams ahead"}</div></div>
+      </div>
+      <div class="codes">${codes}</div>
+      <span class="go">View semester →</span>
+    </button>`;
+  }).join("");
+}
+
+$("#semesters").addEventListener("click", e => {
+  const card = e.target.closest("[data-sem]"); if (!card) return;
+  SEMESTER = card.dataset.sem;
+  renderOverview();
+  window.scrollTo({ top: 0 });
+});
+$("#semBack").addEventListener("click", () => { SEMESTER = null; COURSE = null; renderOverview(); });
+$("#addCourseBtn").addEventListener("click", () => {
+  EDITING = ""; fillEditor(null); renderOverview(); window.scrollTo({ top: 0 });
+});
+$("#editorCancel").addEventListener("click", () => { EDITING = null; renderOverview(); });
+
 function renderOverview() {
-  const { courses, study_next, today } = DATA;
+  const { study_next, today } = DATA;
   $("#today").textContent = today;
   const sn = $("#studynext");
   if (study_next) {
@@ -293,19 +409,34 @@ function renderOverview() {
       <span class="why">Quiz it free with <b>/quiz ${esc(study_next.course)}</b> in Claude Code</span>`;
   } else sn.hidden = true;
 
+  if (EDITING !== null) {
+    $("#semList").hidden = $("#semDetail").hidden = $("#courseDetail").hidden = true;
+    $("#editorPane").hidden = false;
+    return;
+  }
+  $("#editorPane").hidden = true;
+
+  const groups = semesterGroups();
+  const group = groups.find(g => g.key === SEMESTER) || null;
+  if (SEMESTER && !group) SEMESTER = null;  // semester disappeared (course edited/removed)
+  const course = group ? group.courses.find(c => c.id === COURSE) || null : null;
+  if (COURSE && !course) COURSE = null;
+  $("#semList").hidden = !!group;
+  $("#semDetail").hidden = !group || !!course;
+  $("#courseDetail").hidden = !course;
+  if (!group) { renderSemesterCards(groups); return; }
+  if (course) { renderCourseDetail(course, group); return; }
+  $("#semTitle").textContent = group.label;
+  $("#semCount").textContent = `${group.courses.length} course${group.courses.length === 1 ? "" : "s"}`;
+  renderCourseCards(group.courses);
+}
+
+function renderCourseCards(courses) {
   const host = $("#courses");
-  if (!courses.length) { host.innerHTML = `<div class="empty">No courses yet — add one in the editor tab.</div>`; return; }
+  if (!courses.length) { host.innerHTML = `<div class="empty">No courses in this semester.</div>`; return; }
   host.innerHTML = courses.map(c => {
     const g = c.grade, m = c.mastery;
     const grade = g.current !== null ? g.current + "%" : "—";
-    let need = "";
-    if (g.needed_for_aplus !== null) {
-      need = g.aplus_achievable
-        ? `<div class="need">need <span class="ok">≥${g.needed_for_aplus}%</span> on remaining for A+ (cutoff ${g.cutoff}%)</div>`
-        : `<div class="need out">A+ out of reach — needs ${g.needed_for_aplus}% on remaining</div>`;
-    } else if (g.current !== null) {
-      need = g.aplus_achievable ? `<div class="need"><span class="ok">A+ secured 🎉</span></div>` : `<div class="need out">final grade below A+ cutoff</div>`;
-    }
     const dueSet = new Set(m.topics_due);
     const topics = c.topics.map(t => `
       <div class="topicline">
@@ -313,20 +444,85 @@ function renderOverview() {
         <span class="bar"><i style="width:${t.mastery || 0}%"></i></span>
         <span class="pct">${Math.round(t.mastery || 0)}</span>
       </div>`).join("");
-    const compOpts = c.components.map(x => `<option>${esc(x.name)}</option>`).join("");
-    const topicOpts = c.topics.map(t => `<option value="${esc(t.id)}">${esc(t.title)}</option>`).join("");
-    return `<div class="card" data-course="${esc(c.id)}">
+    const exam = nextExamIn([c]);
+    return `<button class="card sem-card" data-course="${esc(c.id)}">
       <div class="frow" style="justify-content:space-between">
         <h3>${esc(c.name)}<span class="code">${esc(c.code)}</span></h3>${termChip(c.term)}
       </div>
       <div class="statrow">
         <div class="stat"><div class="v">${grade}</div><div class="l">current grade</div></div>
         <div class="stat"><div class="v">${m.avg_mastery}%</div><div class="l">avg mastery</div></div>
+        <div class="stat"><div class="v">${gradedWeight(c)}%</div><div class="l">course graded</div></div>
+      </div>
+      <div>${topics || '<div class="hint">no topics yet</div>'}</div>
+      <span class="go">${exam ? `next: ${esc(exam.label)} in ${exam.days}d · ` : ""}Open course →</span>
+    </button>`;
+  }).join("");
+}
+
+/* Share of the final grade that has actually been marked. */
+function gradedWeight(c) {
+  return Math.round((c.components || [])
+    .reduce((s, x) => s + (c.grade.per_component[x.name] != null ? x.weight : 0), 0));
+}
+
+function renderCourseDetail(c, group) {
+  const g = c.grade, m = c.mastery;
+  const done = gradedWeight(c);
+  const dueSet = new Set(m.topics_due);
+
+  const comps = (c.components || []).map(x => {
+    const pct = g.per_component[x.name];
+    const items = (c.grade_entries || []).filter(e => e.component === x.name)
+      .map(e => `<span>${esc(e.name)} ${e.score}/${e.max}</span>`).join("");
+    return `<div class="compline">
+        <span class="t">${esc(x.name)}</span>
+        <span class="w">${x.weight}%</span>
+        <span class="bar"><i style="width:${pct ?? 0}%"></i></span>
+        <span class="pct">${pct == null ? "—" : Math.round(pct)}</span>
+      </div>
+      ${items ? `<div class="entries">${items}</div>` : ""}`;
+  }).join("") || `<div class="hint">no components defined — add them with <b>Edit course</b></div>`;
+
+  const exams = (c.exams || []).map(e => ({ ...e, days: daysUntil(e.date) }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(e => `<div class="examline${e.days < 0 ? " past" : ""}">
+      <span>${esc(e.name)} · ${esc(e.date)}</span>
+      <span class="cd${e.days >= 0 && e.days <= 7 ? " soon" : ""}">${e.days < 0 ? "done" : e.days === 0 ? "today" : `in ${e.days}d`}</span>
+    </div>`).join("") || `<div class="hint">no exam dates yet</div>`;
+
+  const topics = c.topics.map(t => `
+      <div class="topicline">
+        <span class="t">${dueSet.has(t.title) ? '<span class="due-dot" title="due for review"></span>' : ""}${esc(t.title)}</span>
+        <span class="bar"><i style="width:${t.mastery || 0}%"></i></span>
+        <span class="pct">${Math.round(t.mastery || 0)}</span>
+      </div>`).join("") || `<div class="hint">no topics yet — add them with <b>Edit course</b></div>`;
+
+  const compOpts = (c.components || []).map(x => `<option>${esc(x.name)}</option>`).join("");
+  const topicOpts = c.topics.map(t => `<option value="${esc(t.id)}">${esc(t.title)}</option>`).join("");
+
+  $("#courseDetail").innerHTML = `
+    <div class="crumb">
+      <button class="btn ghost" id="courseBack">← ${esc(group.label)}</button>
+      <h2>${esc(c.name)}</h2><span class="count">${esc(c.code)}</span>${termChip(c.term)}
+      <span style="flex:1"></span>
+      <button class="btn" id="editCourseBtn">Edit course</button>
+    </div>
+    <div class="card" data-course="${esc(c.id)}" style="margin-bottom:14px">
+      <div class="statrow">
+        <div class="stat"><div class="v">${g.current !== null ? g.current + "%" : "—"}</div><div class="l">current grade</div></div>
+        <div class="stat"><div class="v">${done}%</div><div class="l">of course graded</div></div>
+        <div class="stat"><div class="v">${m.avg_mastery}%</div><div class="l">avg mastery</div></div>
         <div class="stat"><div class="v">${m.topics_due.length}</div><div class="l">topics due</div></div>
       </div>
-      ${need}
-      <div>${topics || '<div class="hint">no topics yet</div>'}</div>
-      <details class="actions"><summary>Record grade · quiz result · hours</summary>
+      <span class="bar"><i style="width:${done}%"></i></span>
+      <div class="hint">${done}% of the final grade is marked, ${100 - done}% still to come</div>
+    </div>
+    <div class="detail-grid">
+      <div class="card"><h4>Graded components</h4>${comps}</div>
+      <div class="card"><h4>Exams</h4>${exams}</div>
+      <div class="card"><h4>Topics &amp; mastery</h4>${topics}</div>
+      <div class="card" data-course="${esc(c.id)}"><h4>Record</h4>
         <form class="aform" data-act="grade">
           <span class="label">Grade</span>
           <select name="component">${compOpts}</select>
@@ -340,31 +536,33 @@ function renderOverview() {
           <span class="label">Quiz result</span>
           <select name="topic">${topicOpts}</select>
           <input name="pct" class="sm" type="number" min="0" max="100" step="any" placeholder="%" required>
-          <button class="btn">Save</button>
+          <button class="btn"${c.topics.length ? "" : " disabled"}>Save</button>
         </form>
-        <form class="aform" data-act="hours">
-          <span class="label">Study hours</span>
-          <input name="hours" class="sm" type="number" min="0" step="0.25" placeholder="1.5" required>
-          <button class="btn">Log</button>
-        </form>
-      </details>
+      </div>
     </div>`;
-  }).join("");
+  $("#courseBack").addEventListener("click", () => { COURSE = null; renderOverview(); });
+  $("#editCourseBtn").addEventListener("click", () => {
+    EDITING = c.id; fillEditor(c); renderOverview(); window.scrollTo({ top: 0 });
+  });
 }
 
-$("#courses").addEventListener("submit", async e => {
+$("#courses").addEventListener("click", e => {
+  const card = e.target.closest("[data-course]"); if (!card) return;
+  COURSE = card.dataset.course;
+  renderOverview();
+  window.scrollTo({ top: 0 });
+});
+
+$("#courseDetail").addEventListener("submit", async e => {
   e.preventDefault();
   const form = e.target, course = form.closest(".card").dataset.course;
   const f = Object.fromEntries(new FormData(form));
   if (form.dataset.act === "grade") {
     await api("/api/grades", "POST", { course, ...f });
     toast(`Recorded ${f.name}: ${f.score}/${f.max}`);
-  } else if (form.dataset.act === "quiz") {
+  } else {
     const r = await api("/api/quiz-result", "POST", { course, topic: f.topic, pct: f.pct });
     toast(`Mastery → ${r.topic.mastery}% · next review ${r.topic.next_review}`);
-  } else {
-    const r = await api("/api/log", "POST", { name: course, hours: f.hours });
-    toast(`Logged ${f.hours}h (total ${r.total}h)`);
   }
   form.reset();
   await refresh(false);
@@ -394,29 +592,31 @@ function rowsData(host, fields) {
 function fillEditor(c) {
   $("#editorTitle").textContent = c ? `Edit: ${c.name}` : "Add a course";
   $("#cName").value = c?.name || ""; $("#cCode").value = c?.code || "";
-  $("#cTerm").value = c?.term || "fall"; $("#cCutoff").value = c?.aplus_cutoff ?? 90;
+  $("#cTerm").value = c?.term || "fall";
+  const sy = c ? startYear(c) : startYear({});
+  $("#cYear").value = (c?.term === "winter") ? sy + 1 : sy;
   $("#compRows").replaceChildren(...(c?.components || [{name:"",weight:""}]).map(x => compRow(x.name, x.weight)));
   $("#topicRows").replaceChildren(...(c?.topics || [{}]).map(t => topicRow(t.title || "", t.id || "")));
   $("#examRows").replaceChildren(...(c?.exams || []).map(x => examRow(x.name, x.date)));
   updateWeightSum();
 }
-$("#editTarget").addEventListener("change", e => {
-  fillEditor(DATA.courses.find(c => c.id === e.target.value) || null);
-});
 $("#courseForm").addEventListener("submit", async e => {
   e.preventDefault();
   const body = {
     name: $("#cName").value, code: $("#cCode").value, term: $("#cTerm").value,
-    aplus_cutoff: $("#cCutoff").value,
+    year: $("#cYear").value,
     components: rowsData($("#compRows"), ["name","weight"]),
     topics: rowsData($("#topicRows"), ["title","id"]),
     exams: rowsData($("#examRows"), ["name","date"]),
   };
-  const target = $("#editTarget").value;
+  const target = EDITING;
   const r = target ? await api(`/api/courses/${target}`, "PUT", body) : await api("/api/courses", "POST", body);
   toast(`Saved ${body.name} (${r.id})`);
+  EDITING = null;
   await refresh(false);
-  $("#editTarget").value = r.id;
+  const saved = DATA.courses.find(c => c.id === r.id);   // land on the course you just saved
+  if (saved) { SEMESTER = semesterOf(saved).key; COURSE = saved.id; }
+  renderOverview();
 });
 
 /* ---------- projects ---------- */
@@ -522,11 +722,7 @@ async function refresh(resetEditor=true) {
   [DATA, PROJECTS, TODOS, GCAL] = await Promise.all([
     api("/api/overview"), api("/api/projects"), api("/api/todos"), api("/api/gcal/events")]);
   renderPlanner(); renderOverview(); renderProjects(); renderHours();
-  const sel = $("#editTarget"), cur = sel.value;
-  sel.innerHTML = `<option value="">— new course —</option>` +
-    DATA.courses.map(c => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
-  sel.value = cur;
-  if (resetEditor) fillEditor(null);
+  if (resetEditor) { EDITING = null; fillEditor(null); }
 }
 refresh();
 </script>

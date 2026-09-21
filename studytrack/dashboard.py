@@ -178,11 +178,11 @@ function renderCourses() {
     let need = "";
     if (g.needed_for_aplus !== null) {
       need = g.aplus_achievable
-        ? `<div class="need">need <span class="ok">≥${g.needed_for_aplus}%</span> on remaining for A+ (cutoff ${g.cutoff}%)</div>`
+        ? `<div class="need">need <span class="ok">≥${g.needed_for_aplus}%</span> on remaining for A+</div>`
         : `<div class="need out">A+ out of reach — needs ${g.needed_for_aplus}% on remaining</div>`;
     } else if (g.current !== null) {
       need = g.aplus_achievable ? `<div class="need"><span class="ok">A+ secured 🎉</span></div>`
-                                : `<div class="need out">final grade below A+ cutoff</div>`;
+                                : `<div class="need out">final grade below A+</div>`;
     }
     const ex = nextExam(c);
     const exam = ex ? `<div class="exam">${esc(ex.name)} in <b class="${ex.days <= 14 ? "soon" : ""}">${ex.days} day${ex.days === 1 ? "" : "s"}</b> (${esc(ex.date)})</div>` : "";

@@ -20,18 +20,4 @@ exams:
   - name: Final
     date: 2027-04-16
 
-topics:
-  - id: integration-techniques
-    title: "Integration techniques"
-  - id: applications-of-integration-area-volume
-    title: "Applications of integration (area, volume, arc length)"
-  - id: sequences-and-series
-    title: "Sequences and series"
-  - id: convergence-tests
-    title: "Convergence tests"
-  - id: power-and-taylor-series
-    title: "Power and Taylor series"
-  - id: parametric-curves-and-polar-coordinates
-    title: "Parametric curves and polar coordinates"
-  - id: introduction-to-differential-equations
-    title: "Introduction to differential equations"
+topics: []

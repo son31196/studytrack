@@ -20,18 +20,4 @@ exams:
   - name: Final
     date: 2026-12-14
 
-topics:
-  - id: kinematics-in-one-and-two-dimensions
-    title: "Kinematics in one and two dimensions"
-  - id: newton-s-laws-of-motion
-    title: "Newton's laws of motion"
-  - id: work-and-energy
-    title: "Work and energy"
-  - id: momentum-impulse-and-collisions
-    title: "Momentum, impulse, and collisions"
-  - id: rotational-motion-and-torque
-    title: "Rotational motion and torque"
-  - id: static-equilibrium-and-elasticity
-    title: "Static equilibrium and elasticity"
-  - id: oscillations-and-simple-harmonic-motion
-    title: "Oscillations and simple harmonic motion"
+topics: []

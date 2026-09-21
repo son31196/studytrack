@@ -20,20 +20,4 @@ exams:
   - name: Final
     date: 2026-12-14
 
-topics:
-  - id: variables-types-and-expressions
-    title: "Variables, types, and expressions"
-  - id: control-flow-conditionals-and-loops
-    title: "Control flow: conditionals and loops"
-  - id: functions-and-scope
-    title: "Functions and scope"
-  - id: arrays-and-strings
-    title: "Arrays and strings"
-  - id: pointers-and-dynamic-memory
-    title: "Pointers and dynamic memory"
-  - id: structs-classes-and-object-oriented-basi
-    title: "Structs, classes, and object-oriented basics"
-  - id: file-input-output
-    title: "File input/output"
-  - id: searching-sorting-and-debugging
-    title: "Searching, sorting, and debugging"
+topics: []

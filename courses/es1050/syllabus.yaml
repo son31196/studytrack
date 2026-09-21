@@ -16,18 +16,4 @@ exams:
   - name: Final design review
     date: 2027-04-16
 
-topics:
-  - id: the-engineering-design-process
-    title: "The engineering design process"
-  - id: problem-definition-and-needs-analysis
-    title: "Problem definition and needs analysis"
-  - id: concept-generation-and-selection
-    title: "Concept generation and selection"
-  - id: cad-and-prototyping
-    title: "CAD and prototyping"
-  - id: teamwork-and-project-management
-    title: "Teamwork and project management"
-  - id: engineering-communication
-    title: "Engineering communication"
-  - id: ethics-professionalism-and-sustainabilit
-    title: "Ethics, professionalism, and sustainability"
+topics: []

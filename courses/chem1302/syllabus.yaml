@@ -20,22 +20,4 @@ exams:
   - name: Final
     date: 2026-12-14
 
-topics:
-  - id: stoichiometry-and-chemical-reactions
-    title: "Stoichiometry and chemical reactions"
-  - id: atomic-structure-and-periodicity
-    title: "Atomic structure and periodicity"
-  - id: chemical-bonding-and-molecular-structure
-    title: "Chemical bonding and molecular structure"
-  - id: gases-and-states-of-matter
-    title: "Gases and states of matter"
-  - id: thermochemistry
-    title: "Thermochemistry"
-  - id: thermodynamics-entropy-and-free-energy
-    title: "Thermodynamics: entropy and free energy"
-  - id: chemical-kinetics
-    title: "Chemical kinetics"
-  - id: equilibrium
-    title: "Equilibrium"
-  - id: electrochemistry-and-corrosion
-    title: "Electrochemistry and corrosion"
+topics: []

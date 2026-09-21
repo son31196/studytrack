@@ -20,22 +20,4 @@ exams:
   - name: Final
     date: 2027-04-16
 
-topics:
-  - id: force-vectors
-    title: "Force vectors"
-  - id: equilibrium-of-a-particle
-    title: "Equilibrium of a particle"
-  - id: moments-and-couples
-    title: "Moments and couples"
-  - id: rigid-body-equilibrium
-    title: "Rigid-body equilibrium"
-  - id: trusses-frames-and-machines
-    title: "Trusses, frames, and machines"
-  - id: centroids-and-centre-of-gravity
-    title: "Centroids and centre of gravity"
-  - id: moments-of-inertia
-    title: "Moments of inertia"
-  - id: friction
-    title: "Friction"
-  - id: internal-forces-and-shear-bending-moment
-    title: "Internal forces and shear/bending-moment diagrams"
+topics: []
